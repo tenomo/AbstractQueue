@@ -13,7 +13,7 @@ namespace AbstractQueue
         /// <summary>
         /// Task status.
         /// </summary>
-        internal ETaskStatus ETaskStatus { get; set; }
+        public ETaskStatus ETaskStatus { get; internal set; }
 
 
 
