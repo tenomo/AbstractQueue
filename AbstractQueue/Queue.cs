@@ -15,7 +15,7 @@ namespace AbstractQueue
         /// <summary>
         /// Executeble queueTask array.
         /// </summary>
-        private readonly QueueTask[] _queueTasks;
+        private readonly QueueTask[] QueueTasks;
         /// <summary>
         /// Concrete executer
         /// </summary>
@@ -32,7 +32,7 @@ namespace AbstractQueue
         public Queue(int threadCount, AbstractTaskExecuter executer)
         {
             ThreadCount = threadCount;
-            _queueTasks = new QueueTask[threadCount];
+            QueueTasks = new QueueTask[threadCount];
             Executer = executer;
             _taskStore = new TaskStore();
             _isHandleFailed = false;
@@ -44,7 +44,7 @@ namespace AbstractQueue
         public Queue(int threadCount, AbstractTaskExecuter executer, bool isHandleFailed, int countHandleFailed)
         {
             ThreadCount = threadCount;
-            _queueTasks = new QueueTask[threadCount];
+            QueueTasks = new QueueTask[threadCount];
             Executer = executer;
             _isHandleFailed = isHandleFailed;
             _countHandleFailed = countHandleFailed;
@@ -69,12 +69,12 @@ namespace AbstractQueue
 
         private void TryStartTask()
         {
-            bool isCan;
-            int taskId;
+            bool isCan = false;
+            int taskId = 0;
             IsCanExecuteTask(out isCan, out taskId);
-            if (isCan)
+            if (isCan )
             {
-                var executeTask = _queueTasks[taskId];
+                var executeTask = QueueTasks[taskId];
                 executeTask.QueueTaskStatus = QueueTaskStatus.InProcces;
                  
                 new TaskFactory().StartNew(() =>
@@ -83,12 +83,15 @@ namespace AbstractQueue
                     Executer.Execute(executeTask);
                 });
             }
+            
         }
 
         public int AddTask(QueueTask queueTask)
         {
             _taskStore.Add(queueTask);
+
             TryStartTask();
+           
             return _taskStore.IndexOf(queueTask);
         }
 
@@ -100,21 +103,24 @@ namespace AbstractQueue
         private void IsCanExecuteTask(out bool isCan, out int index)
         {
             index = -1;
-            int countExecuteTasks = _queueTasks.Count(each => each?.QueueTaskStatus == QueueTaskStatus.InProcces);
+            int countExecuteTasks = QueueTasks.Count(each => each?.QueueTaskStatus == QueueTaskStatus.InProcces);
 
+           
 
             var task = _taskStore.FirstOrDefault(each => each.QueueTaskStatus == QueueTaskStatus.Created);
             isCan = countExecuteTasks < ThreadCount && task != null;
             if (isCan)
                 for (index = 0; index < ThreadCount; index++)
                 {
-                    var each = _queueTasks[index];
+                    var each = QueueTasks[index];
                     if (each == null || each?.QueueTaskStatus == QueueTaskStatus.Created)
                     {
-                        _queueTasks[index] = task;
+                        QueueTasks[index] = task;
                         return;
                     }
                 }
         }
+
+         
     }
 }

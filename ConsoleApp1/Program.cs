@@ -1,7 +1,8 @@
 ﻿
 
 using System;
-using System.Text; 
+using System.Text;
+using System.Threading.Tasks;
 using AbstractQueue;
 
 namespace ConsoleApp1
@@ -14,7 +15,9 @@ namespace ConsoleApp1
 
             for (int i = 0; i < 20; i++)
             {
-                mySyppQueue.AddTask(new QueueTask((int)SuperTaskTypes.MySuperTaskWrapper, Encoding.UTF8.GetBytes("Helo world queue. Handle queueTask [#] " + i.ToString())));
+                string id = i.ToString();
+                new TaskFactory().StartNew(() => { mySyppQueue.AddTask(new QueueTask((int)SuperTaskTypes.MySuperTaskWrapper, Encoding.UTF8.GetBytes("Helo world queue. Handle queueTask [#] " + id.ToString()))); });
+               
             }
 
             Console.Read();
