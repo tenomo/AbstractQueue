@@ -31,11 +31,12 @@ namespace ConsoleApp1
                         try
                         {
                             Console.WriteLine(Encoding.UTF8.GetString(task.TaskBody)); 
+                            task.SetSuccess();
                         }
                         catch (Exception e)
                         {
-                            Console.WriteLine(Encoding.UTF8.GetString(task.TaskBody));
-                            base.SetTaskStatus(task, ETaskStatus.Failed);
+                            Console.WriteLine(e);
+                            task.SetFailed();
                         }
                     
                         break;

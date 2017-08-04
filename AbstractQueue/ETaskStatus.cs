@@ -6,6 +6,6 @@
         InProcces,
         Failed,
         Success,
-        NotProcces = Failed | Success | InProcces
+        NotProccess = Failed | Success | InProcces
     }
 }

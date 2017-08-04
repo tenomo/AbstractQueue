@@ -9,10 +9,26 @@ namespace AbstractQueue
         /// Task id.
         /// </summary>
         public int Id { get; set; }
+
         /// <summary>
         /// Task status.
         /// </summary>
-        public ETaskStatus ETaskStatus { get; set; }
+        internal ETaskStatus ETaskStatus { get; set; }
+
+
+
+        public void SetFailed()
+        {
+            ETaskStatus = ETaskStatus.Failed;
+            OnExecutedTask(ETaskStatus);
+        }
+
+        public void SetSuccess()
+        {
+            ETaskStatus = ETaskStatus.Success;
+            OnExecutedTask(ETaskStatus);
+        }
+
         /// <summary>
         /// Task type for the determinate executer(custom value).
         /// </summary>
@@ -37,7 +53,7 @@ namespace AbstractQueue
         /// </summary>
         public DateTime ExecutedDate;
 
-        private byte _attempt;
+        private byte _attempt; 
 
 
         public byte Attempt
@@ -64,5 +80,11 @@ namespace AbstractQueue
         }
 
 
+        private   void OnExecutedTask(  ETaskStatus taskStatus)
+        {
+            if (taskStatus == ETaskStatus.Failed || taskStatus == ETaskStatus.Success)
+                ExecutedTask?.Invoke(this);
+         
+        }
     }
 }

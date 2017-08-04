@@ -58,16 +58,11 @@ namespace AbstractQueue
         /// <param name="task"></param>
         private void Task_ExecutedTask(Task task)
         {
-            if (task.ETaskStatus == ETaskStatus.InProcces)
+            if (task.ETaskStatus == ETaskStatus.Success)
             {
                 task.ETaskStatus = ETaskStatus.Success;
                 task.ExecutedDate = DateTime.Now;
             }
-            else if (task.ETaskStatus == ETaskStatus.NotProcces)
-            {
-                task.ETaskStatus = ETaskStatus.NotProcces;
-            }
-
             TryStartTask();
         }
 
@@ -79,12 +74,12 @@ namespace AbstractQueue
             IsCanExecuteTask(out isCan, out taskId);
             if (isCan)
             {
+                var executeTask = Tasks[taskId];
+                executeTask.ETaskStatus = ETaskStatus.InProcces;
+                 
                 new TaskFactory().StartNew(() =>
                 {
-
-                    var executeTask = Tasks[taskId];
-                    executeTask.ETaskStatus = ETaskStatus.InProcces;
-                    executeTask.ExecutedTask += Task_ExecutedTask;
+                  executeTask.ExecutedTask += Task_ExecutedTask;
                     Executer.Execute(executeTask);
                 });
             }
@@ -109,10 +104,10 @@ namespace AbstractQueue
             var task = _taskStore.FirstOrDefault(each => each.ETaskStatus == ETaskStatus.Created);
             isCan = countExecuteTasks < ThreadCount && task != null;
             if (isCan)
-                for (index = 0; index < Tasks.Length; index++)
+                for (index = 0; index < ThreadCount; index++)
                 {
                     var each = Tasks[index];
-                    if (each == null || each?.ETaskStatus == ETaskStatus.NotProcces)
+                    if (each == null || each?.ETaskStatus == ETaskStatus.Created)
                     {
                         Tasks[index] = task;
                         return;
