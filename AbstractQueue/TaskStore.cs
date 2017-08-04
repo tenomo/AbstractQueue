@@ -7,7 +7,7 @@ using System.Threading.Tasks;
 
 namespace AbstractQueue
 {
-    public sealed class TaskStore : IList<QueueTask>, ITaskStore
+    internal sealed class TaskStore : IList<QueueTask>, ITaskStore
     {
         private readonly IQueueDBContext context;
 
@@ -43,7 +43,7 @@ namespace AbstractQueue
             set { Tasks[index] = value; }
         }
 
-        public TaskStore(IQueueDBContext context)
+        internal TaskStore(IQueueDBContext context)
         {
             this.context = context;
         }
@@ -62,13 +62,15 @@ namespace AbstractQueue
                 ExecutedTask?.Invoke(task);
         }
 
-        public void SetProcces(QueueTask task)
+        internal void SetProcces(QueueTask task)
         {
             if (task.QueueTaskStatus == QueueTaskStatus.Created)
                 ExecutedTask?.Invoke(task);
             else
                 throw new OperationCanceledException("The task is already completed");
         }
+
+       
 
         public event Action<QueueTask> ExecutedTask;
     }

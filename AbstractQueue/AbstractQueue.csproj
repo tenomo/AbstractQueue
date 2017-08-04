@@ -49,9 +49,12 @@
   <ItemGroup>
     <Compile Include="AbstractTaskExecuter.cs" />
     <Compile Include="IExecutedTask.cs" />
+    <Compile Include="IQueue.cs" />
     <Compile Include="IQueueDBContext.cs" />
     <Compile Include="IQueueName.cs" />
     <Compile Include="ITaskStore.cs" />
+    <Compile Include="QueueFactory.cs" />
+    <Compile Include="QueueSingleton.cs" />
     <Compile Include="QueueTaskStatus.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
     <Compile Include="Queue.cs" />

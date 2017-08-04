@@ -7,7 +7,7 @@ using System.Threading.Tasks;
 namespace AbstractQueue
 { 
 
-  public sealed class Queue : IExecutedTask, IQueueName
+  internal   class Queue : IExecutedTask, IQueueName, IQueue
     {
         /// <summary>
         /// Count workers.
@@ -22,38 +22,52 @@ namespace AbstractQueue
         /// </summary>
         private readonly AbstractTaskExecuter Executer;
 
-        private readonly bool _isHandleFailed;
-        private readonly int _countHandleFailed;
+        private  bool _isHandleFailed = false;
+        private  int _countHandleFailed;
+
+        public int CountHandleFailed
+        {
+            get { return _countHandleFailed; }
+            private set
+            {
+                if (value > 1)
+                    _isHandleFailed = true;
+                else if (value<0)
+                {
+                    throw new ArgumentException("CountHandleFailed must be more 0");
+                }
+
+                _countHandleFailed = value;
+            }
+        }
+
 
         /// <summary>
-        /// QueueTask _taskStore.
+        /// QueueTask TaskStore.
         /// </summary>
-        private readonly TaskStore _taskStore;
+        private readonly TaskStore TaskStore;
 
 
      
 
-        private Queue(int threadCount, AbstractTaskExecuter executer , IQueueDBContext queueDbContext)
+        internal Queue(int threadCount, AbstractTaskExecuter executer , IQueueDBContext queueDbContext)
         {
             ThreadCount = threadCount;
             QueueTasks = new QueueTask[threadCount];
             Executer = executer;
-            _taskStore = new TaskStore(queueDbContext);
+            TaskStore = new TaskStore(queueDbContext);
+
             _isHandleFailed = false;
             _countHandleFailed = -1;
+
+            executer.TaskStore = TaskStore;
         }
 
        
 
-        private Queue(int threadCount, AbstractTaskExecuter executer, bool isHandleFailed, int countHandleFailed, IQueueDBContext queueDbContext)
+        internal Queue(int threadCount, AbstractTaskExecuter executer , IQueueDBContext queueDbContext, int countHandleFailed) : this(threadCount, executer  ,queueDbContext)
         {
-            ThreadCount = threadCount;
-            QueueTasks = new QueueTask[threadCount];
-            Executer = executer;
-            _isHandleFailed = isHandleFailed;
-            _countHandleFailed = countHandleFailed;
-            _taskStore = new TaskStore(queueDbContext);
-
+            CountHandleFailed = countHandleFailed;
         }
 
      
@@ -65,8 +79,10 @@ namespace AbstractQueue
         {
             if (queueTask.QueueTaskStatus == QueueTaskStatus.Success)
             {
+               
                 queueTask.QueueTaskStatus = QueueTaskStatus.Success;
                 queueTask.ExecutedDate = DateTime.Now;
+                TaskStore.SaveChanges();
                 ExecutedTask?.Invoke(queueTask);
             }
             TryStartTask();
@@ -82,18 +98,19 @@ namespace AbstractQueue
             if (isCan )
             {
                 var executeTask = QueueTasks[taskId];
-                executeTask.QueueTaskStatus = QueueTaskStatus.InProcces;
-                 
+               
+                executeTask.QueueTaskStatus = executeTask.QueueTaskStatus == QueueTaskStatus.Created ? QueueTaskStatus.InProcces: QueueTaskStatus.TryFailInProcces;
+                TaskStore.SaveChanges();
                 new TaskFactory().StartNew(() =>
                 {
                     try
                     {
-                        _taskStore.ExecutedTask += Task_ExecutedTask;
+                        TaskStore.ExecutedTask += Task_ExecutedTask;
                         Executer.Execute(executeTask);
                     }
                     catch 
                     {
-                        _taskStore.SetFailed(executeTask);
+                        TaskStore.SetFailed(executeTask);
                     }
 
                 });
@@ -103,11 +120,11 @@ namespace AbstractQueue
 
         public int AddTask(QueueTask queueTask)
         {
-            _taskStore.Add(queueTask);
+            TaskStore.Add(queueTask);
 
             TryStartTask();
            
-            return _taskStore.IndexOf(queueTask);
+            return TaskStore.IndexOf(queueTask);
         }
 
         /// <summary>
@@ -118,9 +135,9 @@ namespace AbstractQueue
         private void IsCanExecuteTask(out bool isCan, out int index)
         {
             index = -1;
-            int countExecuteTasks = QueueTasks.Count(each => CheckQueueTaskStatus(each));
+            int countExecuteTasks = QueueTasks.Count(CheckQueueTaskStatus);
 
-            var task = _taskStore.FirstOrDefault(each => CheckQueueTaskStatus(each ) && each.QueueName == QueueName);
+            var task = TaskStore.FirstOrDefault(each => CheckQueueTaskStatus(each ) && each.QueueName == QueueName);
             isCan = countExecuteTasks < ThreadCount && task != null;
             if (isCan)
                 for (index = 0; index < ThreadCount; index++)
@@ -137,9 +154,6 @@ namespace AbstractQueue
 
         private bool CheckQueueTaskStatus(QueueTask task  )
         {
-            //if (task == null)
-            //    return true;
-
             if (_isHandleFailed)
                 return task?.QueueTaskStatus == QueueTaskStatus.Created || task.QueueTaskStatus == QueueTaskStatus.Failed;
             else
@@ -150,7 +164,7 @@ namespace AbstractQueue
         {
             if (task == null || _isHandleFailed == false)
                 return true;
-            if (task.QueueTaskStatus == QueueTaskStatus.Failed && task.Attempt >= _countHandleFailed)
+            if (task.QueueTaskStatus == QueueTaskStatus.Failed && task.Attempt >= CountHandleFailed)
                 return false;
             else
             {
@@ -160,30 +174,7 @@ namespace AbstractQueue
 
         #region Factory methods
 
-        /// <summary>
-        /// Create Queue which the try handle failed task n times.
-        /// </summary>
-        /// <param name="threadCount"></param>
-        /// <param name="executer"></param>
-        /// <param name="isHandleFailed"></param>
-        /// <param name="countHandleFailed"></param>
-        /// <returns></returns>
-        public static Queue CreateQueueHandleFailed(int threadCount, AbstractTaskExecuter executer, bool isHandleFailed,
-            int countHandleFailed, IQueueDBContext queueDbContext )
-        {
-            return new Queue(threadCount, executer, isHandleFailed, countHandleFailed,queueDbContext);
-        }
-
-        /// <summary>
-        /// Create Queue.
-        /// </summary>
-        /// <param name="threadCount"></param>
-        /// <param name="executer"></param>
-        /// <returns></returns>
-        public static Queue CreateQueue(int threadCount, AbstractTaskExecuter executer, IQueueDBContext queueDbContext)
-        {
-            return new Queue(threadCount, executer, queueDbContext);
-        }
+       
 
         public event Action<QueueTask> ExecutedTask;
         public string QueueName { get; set; }

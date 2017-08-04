@@ -1,6 +1,6 @@
 ﻿namespace AbstractQueue
 {
-  internal  interface IQueueName
+  public  interface IQueueName
     {
         string QueueName { get; set; }
     }

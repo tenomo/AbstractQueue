@@ -12,6 +12,7 @@ namespace ConsoleApp1
         static void Main(string[] args)
         {
        //     Queue mySyppQueue =   Queue.CreateQueue(3, new MySuperExecuter());
+       Console.WriteLine((int)SuperTaskTypes.all);
 
             for (int i = 0; i < 20; i++)
             {
@@ -48,7 +49,9 @@ namespace ConsoleApp1
 
         enum SuperTaskTypes
         {
-            MySuperTaskWrapper = 42
+            MySuperTaskWrapper = 42,
+            test = 32,
+            all = test | MySuperTaskWrapper
         }
          
     }

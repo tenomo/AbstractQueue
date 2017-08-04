@@ -24,6 +24,10 @@
         /// <summary>
         ///  Not procces task.
         /// </summary>
-        NotProccess = Failed | Success | Created
+        NotProccess = Failed | Success | Created,
+
+        TryFailInProcces =  InProcces
+
+       
     }
 }
