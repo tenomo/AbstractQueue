@@ -6,7 +6,7 @@ using System.Threading.Tasks;
 
 namespace AbstractQueue
 {
-  public  class Queue
+  public sealed class Queue : IExecutedTask
     {
         /// <summary>
         /// Count workers.
@@ -28,6 +28,9 @@ namespace AbstractQueue
         /// QueueTask _taskStore.
         /// </summary>
         private readonly TaskStore _taskStore;
+
+
+       
 
         private Queue(int threadCount, AbstractTaskExecuter executer)
         {
@@ -63,6 +66,7 @@ namespace AbstractQueue
             {
                 queueTask.QueueTaskStatus = QueueTaskStatus.Success;
                 queueTask.ExecutedDate = DateTime.Now;
+                ExecutedTask?.Invoke(queueTask);
             }
             TryStartTask();
             
@@ -81,8 +85,16 @@ namespace AbstractQueue
                  
                 new TaskFactory().StartNew(() =>
                 {
-                  executeTask.ExecutedTask += Task_ExecutedTask;
-                    Executer.Execute(executeTask);
+                    try
+                    {
+                        executeTask.ExecutedTask += Task_ExecutedTask;
+                        Executer.Execute(executeTask);
+                    }
+                    catch 
+                    {
+                        executeTask.SetFailed();
+                    }
+
                 });
             }
             
@@ -171,6 +183,9 @@ namespace AbstractQueue
         {
             return new Queue(threadCount, executer);
         }
+
+        public event Action<QueueTask> ExecutedTask;
+
         #endregion
     }
 }

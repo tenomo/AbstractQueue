@@ -2,7 +2,7 @@
 
 namespace AbstractQueue
 {
-  public  class QueueTask
+  public sealed  class QueueTask : IExecutedTask
     {
         private static int _testId;
         /// <summary>

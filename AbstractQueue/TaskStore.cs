@@ -7,7 +7,7 @@ using System.Threading.Tasks;
 
 namespace AbstractQueue
 {
- public    class TaskStore : IList<QueueTask>
+ public  sealed  class TaskStore : IList<QueueTask>
     {
         private readonly List<QueueTask> tasks = new List<QueueTask>();
 

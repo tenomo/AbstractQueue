@@ -41,6 +41,7 @@
   </ItemGroup>
   <ItemGroup>
     <Compile Include="AbstractTaskExecuter.cs" />
+    <Compile Include="IExecutedTask.cs" />
     <Compile Include="QueueTaskStatus.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
     <Compile Include="Queue.cs" />
