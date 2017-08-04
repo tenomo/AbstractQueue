@@ -7,11 +7,11 @@ using System.Threading.Tasks;
 
 namespace AbstractQueue
 {
- public    class TaskStore : IList<Task>
+ public    class TaskStore : IList<QueueTask>
     {
-        private readonly List<Task> tasks = new List<Task>();
+        private readonly List<QueueTask> tasks = new List<QueueTask>();
 
-        public IEnumerator<Task> GetEnumerator()
+        public IEnumerator<QueueTask> GetEnumerator()
         {
             return tasks.GetEnumerator();
         }
@@ -21,7 +21,7 @@ namespace AbstractQueue
             return tasks.GetEnumerator();
         }
 
-        public void Add(Task item)
+        public void Add(QueueTask item)
         {
             tasks.Add(item);
         }
@@ -31,17 +31,17 @@ namespace AbstractQueue
             tasks.Clear();
         }
 
-        public bool Contains(Task item)
+        public bool Contains(QueueTask item)
         {
             return tasks.Contains(item);
         }
 
-        public void CopyTo(Task[] array, int arrayIndex)
+        public void CopyTo(QueueTask[] array, int arrayIndex)
         {
             tasks.CopyTo(array, arrayIndex);
         }
 
-        public bool Remove(Task item)
+        public bool Remove(QueueTask item)
         {
             return tasks.Remove(item);
         }
@@ -56,12 +56,12 @@ namespace AbstractQueue
             get { return false; }
         }
 
-        public int IndexOf(Task item)
+        public int IndexOf(QueueTask item)
         {
             return tasks.IndexOf(item);
         }
 
-        public void Insert(int index, Task item)
+        public void Insert(int index, QueueTask item)
         {
             throw new NotImplementedException();
         }
@@ -71,7 +71,7 @@ namespace AbstractQueue
             throw new NotImplementedException();
         }
 
-        public Task this[int index]
+        public QueueTask this[int index]
         {
             get { return tasks[index]; }
             set { tasks[index] = value; }

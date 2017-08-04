@@ -5,10 +5,10 @@
     {
 
         /// <summary>
-        /// Execute task.
+        /// Execute queueTask.
         /// </summary>
-        /// <param name="task"></param>
-        public abstract void Execute(Task task);
+        /// <param name="queueTask"></param>
+        public abstract void Execute(QueueTask queueTask);
  
     }
 }

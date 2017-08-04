@@ -3,7 +3,6 @@
 using System;
 using System.Text; 
 using AbstractQueue;
-using Task = AbstractQueue.Task;
 
 namespace ConsoleApp1
 {
@@ -15,7 +14,7 @@ namespace ConsoleApp1
 
             for (int i = 0; i < 20; i++)
             {
-                mySyppQueue.AddTask(new Task((int)SuperTaskTypes.MySuperTaskWrapper, Encoding.UTF8.GetBytes("Helo world queue. Handle task [#] " + i.ToString())));
+                mySyppQueue.AddTask(new QueueTask((int)SuperTaskTypes.MySuperTaskWrapper, Encoding.UTF8.GetBytes("Helo world queue. Handle queueTask [#] " + i.ToString())));
             }
 
             Console.Read();
@@ -23,20 +22,20 @@ namespace ConsoleApp1
         } 
         class MySuperExecuter : AbstractTaskExecuter
         {
-          public  override void Execute(Task task)
+          public  override void Execute(QueueTask queueTask)
             {
-                switch (task.TaskType)
+                switch (queueTask.Type)
                 {
                     case ((int)SuperTaskTypes.MySuperTaskWrapper):
                         try
                         {
-                            Console.WriteLine(Encoding.UTF8.GetString(task.TaskBody)); 
-                            task.SetSuccess();
+                            Console.WriteLine(Encoding.UTF8.GetString(queueTask.Body)); 
+                            queueTask.SetSuccess();
                         }
                         catch (Exception e)
                         {
                             Console.WriteLine(e);
-                            task.SetFailed();
+                            queueTask.SetFailed();
                         }
                     
                         break;

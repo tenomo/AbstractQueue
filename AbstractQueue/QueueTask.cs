@@ -2,46 +2,46 @@
 
 namespace AbstractQueue
 {
-  public  class Task
+  public  class QueueTask
     {
         private static int _testId;
         /// <summary>
-        /// Task id.
+        /// QueueTask id.
         /// </summary>
         public int Id { get; set; }
 
         /// <summary>
-        /// Task status.
+        /// QueueTask status.
         /// </summary>
-        public ETaskStatus ETaskStatus { get; internal set; }
+        public QueueTaskStatus QueueTaskStatus { get; internal set; }
 
 
 
         public void SetFailed()
         {
-            ETaskStatus = ETaskStatus.Failed;
-            OnExecutedTask(ETaskStatus);
+            QueueTaskStatus = QueueTaskStatus.Failed;
+            OnExecutedTask(QueueTaskStatus);
         }
 
         public void SetSuccess()
         {
-            ETaskStatus = ETaskStatus.Success;
-            OnExecutedTask(ETaskStatus);
+            QueueTaskStatus = QueueTaskStatus.Success;
+            OnExecutedTask(QueueTaskStatus);
         }
 
         /// <summary>
-        /// Task type for the determinate executer(custom value).
+        /// QueueTask type for determinate the executer(custom value).
         /// </summary>
-        public byte TaskType { get; set; }
+        public byte Type { get; set; }
         /// <summary>
-        /// Task body for execution.
+        /// QueueTask body for execution.
         /// </summary>
-        public byte[] TaskBody { get; set; }
+        public byte[] Body { get; set; }
 
         /// <summary>
         /// Ovserve about executed the task.
         /// </summary>
-        public event Action<Task> ExecutedTask;
+        public event Action<QueueTask> ExecutedTask;
 
         /// <summary>
         /// Date of creation task.
@@ -61,17 +61,17 @@ namespace AbstractQueue
             get { return _attempt; }
             set
             {
-                if (ETaskStatus != ETaskStatus.Failed)
+                if (QueueTaskStatus != QueueTaskStatus.Failed)
                     throw new InvalidOperationException($"Failed {value} attempt, task must be have failed status, check logic");
                 _attempt = value;
             }
         }
 
-        public Task(byte taskType, byte[] taskBody)
+        public QueueTask(byte type, byte[] body)
         {
-            ETaskStatus = ETaskStatus.Created;
-            TaskType = taskType;
-            TaskBody = taskBody;
+            QueueTaskStatus = QueueTaskStatus.Created;
+            Type = type;
+            Body = body;
             CreationDate = DateTime.Now;
 
             _testId++;
@@ -80,9 +80,9 @@ namespace AbstractQueue
         }
 
 
-        private   void OnExecutedTask(  ETaskStatus taskStatus)
+        private   void OnExecutedTask(  QueueTaskStatus taskStatus)
         {
-            if (taskStatus == ETaskStatus.Failed || taskStatus == ETaskStatus.Success)
+            if (taskStatus == QueueTaskStatus.Failed || taskStatus == QueueTaskStatus.Success)
                 ExecutedTask?.Invoke(this);
          
         }

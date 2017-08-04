@@ -13,9 +13,9 @@ namespace AbstractQueue
         /// </summary>
         private readonly int ThreadCount;
         /// <summary>
-        /// Executeble task array.
+        /// Executeble queueTask array.
         /// </summary>
-        private readonly Task[] Tasks;
+        private readonly QueueTask[] _queueTasks;
         /// <summary>
         /// Concrete executer
         /// </summary>
@@ -25,14 +25,14 @@ namespace AbstractQueue
         private readonly int _countHandleFailed;
 
         /// <summary>
-        /// Task _taskStore.
+        /// QueueTask _taskStore.
         /// </summary>
         private readonly TaskStore _taskStore;
 
         public Queue(int threadCount, AbstractTaskExecuter executer)
         {
             ThreadCount = threadCount;
-            Tasks = new Task[threadCount];
+            _queueTasks = new QueueTask[threadCount];
             Executer = executer;
             _taskStore = new TaskStore();
             _isHandleFailed = false;
@@ -44,7 +44,7 @@ namespace AbstractQueue
         public Queue(int threadCount, AbstractTaskExecuter executer, bool isHandleFailed, int countHandleFailed)
         {
             ThreadCount = threadCount;
-            Tasks = new Task[threadCount];
+            _queueTasks = new QueueTask[threadCount];
             Executer = executer;
             _isHandleFailed = isHandleFailed;
             _countHandleFailed = countHandleFailed;
@@ -53,15 +53,15 @@ namespace AbstractQueue
         }
 
         /// <summary>
-        /// Executed task handler.
+        /// Executed queueTask handler.
         /// </summary>
-        /// <param name="task"></param>
-        private void Task_ExecutedTask(Task task)
+        /// <param name="queueTask"></param>
+        private void Task_ExecutedTask(QueueTask queueTask)
         {
-            if (task.ETaskStatus == ETaskStatus.Success)
+            if (queueTask.QueueTaskStatus == QueueTaskStatus.Success)
             {
-                task.ETaskStatus = ETaskStatus.Success;
-                task.ExecutedDate = DateTime.Now;
+                queueTask.QueueTaskStatus = QueueTaskStatus.Success;
+                queueTask.ExecutedDate = DateTime.Now;
             }
             TryStartTask();
         }
@@ -74,8 +74,8 @@ namespace AbstractQueue
             IsCanExecuteTask(out isCan, out taskId);
             if (isCan)
             {
-                var executeTask = Tasks[taskId];
-                executeTask.ETaskStatus = ETaskStatus.InProcces;
+                var executeTask = _queueTasks[taskId];
+                executeTask.QueueTaskStatus = QueueTaskStatus.InProcces;
                  
                 new TaskFactory().StartNew(() =>
                 {
@@ -85,31 +85,33 @@ namespace AbstractQueue
             }
         }
 
-        public int AddTask(Task task)
+        public int AddTask(QueueTask queueTask)
         {
-            _taskStore.Add(task);
+            _taskStore.Add(queueTask);
             TryStartTask();
-            return _taskStore.IndexOf(task);
+            return _taskStore.IndexOf(queueTask);
         }
 
         /// <summary>
-        /// Check executeble task and return boolean value and task index.
+        /// Check executeble queueTask and return boolean value and queueTask index.
         /// </summary>
         /// <param name="isCan"></param>
         /// <param name="index"></param>
         private void IsCanExecuteTask(out bool isCan, out int index)
         {
             index = -1;
-            int countExecuteTasks = _taskStore.Count(each => each?.ETaskStatus == ETaskStatus.InProcces);
-            var task = _taskStore.FirstOrDefault(each => each.ETaskStatus == ETaskStatus.Created);
+            int countExecuteTasks = _queueTasks.Count(each => each?.QueueTaskStatus == QueueTaskStatus.InProcces);
+
+
+            var task = _taskStore.FirstOrDefault(each => each.QueueTaskStatus == QueueTaskStatus.Created);
             isCan = countExecuteTasks < ThreadCount && task != null;
             if (isCan)
                 for (index = 0; index < ThreadCount; index++)
                 {
-                    var each = Tasks[index];
-                    if (each == null || each?.ETaskStatus == ETaskStatus.Created)
+                    var each = _queueTasks[index];
+                    if (each == null || each?.QueueTaskStatus == QueueTaskStatus.Created)
                     {
-                        Tasks[index] = task;
+                        _queueTasks[index] = task;
                         return;
                     }
                 }

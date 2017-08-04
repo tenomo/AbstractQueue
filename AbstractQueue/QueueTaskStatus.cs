@@ -1,6 +1,6 @@
 ﻿namespace AbstractQueue
 {
-   public enum ETaskStatus
+   public enum QueueTaskStatus
     {
         Created,
         InProcces,
