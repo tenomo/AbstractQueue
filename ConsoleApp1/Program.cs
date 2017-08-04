@@ -11,7 +11,7 @@ namespace ConsoleApp1
     {
         static void Main(string[] args)
         {
-            Queue mySyppQueue = new Queue(3, new MySuperExecuter());
+            Queue mySyppQueue =   Queue.CreateQueue(3, new MySuperExecuter());
 
             for (int i = 0; i < 20; i++)
             {

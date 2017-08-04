@@ -105,35 +105,48 @@ namespace AbstractQueue
         private void IsCanExecuteTask(out bool isCan, out int index)
         {
             index = -1;
-            int countExecuteTasks = QueueTasks.Count(each => CheckQueueTaskStatus(each, _isHandleFailed));
+            int countExecuteTasks = QueueTasks.Count(each => CheckQueueTaskStatus(each));
 
-            var task = _taskStore.FirstOrDefault(each => CheckQueueTaskStatus(each , _isHandleFailed));
+            var task = _taskStore.FirstOrDefault(each => CheckQueueTaskStatus(each ));
             isCan = countExecuteTasks < ThreadCount && task != null;
             if (isCan)
                 for (index = 0; index < ThreadCount; index++)
                 {
                     var currentWorker = QueueTasks[index];
-                    if (currentWorker == null || currentWorker?.QueueTaskStatus == QueueTaskStatus.Created)
-                    {
+                    if (currentWorker == null || CheckQueueTaskStatus(currentWorker ) || CheckTaskOnAttemptLimit(currentWorker))
+                    { 
+                         
                         QueueTasks[index] = task;
                         return;
                     }
                 }
         }
 
-        private bool CheckQueueTaskStatus(QueueTask task, bool isHandleFailed )
+        private bool CheckQueueTaskStatus(QueueTask task  )
         {
             //if (task == null)
             //    return true;
 
-            if (isHandleFailed)
+            if (_isHandleFailed)
                 return task?.QueueTaskStatus == QueueTaskStatus.Created || task.QueueTaskStatus == QueueTaskStatus.Failed;
             else
                 return task?.QueueTaskStatus == QueueTaskStatus.Created;
         }
 
+        private bool CheckTaskOnAttemptLimit(QueueTask task)
+        {
+            if (task == null || _isHandleFailed == false)
+                return true;
+            if (task.QueueTaskStatus == QueueTaskStatus.Failed && task.Attempt >= _countHandleFailed)
+                return false;
+            else
+            {
+                return false;
+            }
+        }
+
         #region Factory methods
-       
+
         /// <summary>
         /// Create Queue which the try handle failed task n times.
         /// </summary>
