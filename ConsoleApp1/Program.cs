@@ -44,7 +44,6 @@ namespace ConsoleApp1
                         break;
                 }
             }
-             
         }
 
         enum SuperTaskTypes

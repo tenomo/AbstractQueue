@@ -7,75 +7,47 @@ using System.Threading.Tasks;
 
 namespace AbstractQueue
 {
- public  sealed  class TaskStore : IList<QueueTask>
+    public sealed class TaskStore : IList<QueueTask>, SaveChanges
     {
-        private readonly List<QueueTask> tasks = new List<QueueTask>();
+        private readonly IQueueDBContext context;
 
-        public IEnumerator<QueueTask> GetEnumerator()
-        {
-            return tasks.GetEnumerator();
-        }
+        private List<QueueTask> Tasks => context.Tasks.ToList();
 
-        IEnumerator IEnumerable.GetEnumerator()
-        {
-            return tasks.GetEnumerator();
-        }
+        public IEnumerator<QueueTask> GetEnumerator() => Tasks.GetEnumerator();
+        IEnumerator IEnumerable.GetEnumerator() => Tasks.GetEnumerator();
 
         public void Add(QueueTask item)
         {
-            tasks.Add(item);
+            context.Tasks.Add(item);
+            SaveChanges();
         }
 
         public void Clear()
         {
-            tasks.Clear();
+            Tasks.Clear();
+            context.SaveChanges();
         }
 
-        public bool Contains(QueueTask item)
-        {
-            return tasks.Contains(item);
-        }
-
-        public void CopyTo(QueueTask[] array, int arrayIndex)
-        {
-            tasks.CopyTo(array, arrayIndex);
-        }
-
-        public bool Remove(QueueTask item)
-        {
-            return tasks.Remove(item);
-        }
-
-        public int Count
-        {
-            get { return tasks.Count; }
-        }
-
-        public bool IsReadOnly
-        {
-            get { return false; }
-        }
-
-        public int IndexOf(QueueTask item)
-        {
-            return tasks.IndexOf(item);
-        }
-
-        public void Insert(int index, QueueTask item)
-        {
-            throw new NotImplementedException();
-        }
-
-        public void RemoveAt(int index)
-        {
-            throw new NotImplementedException();
-        }
+        public bool Contains(QueueTask item) => Tasks.Contains(item);
+        public void CopyTo(QueueTask[] array, int arrayIndex) => Tasks.CopyTo(array, arrayIndex);
+        public bool Remove(QueueTask item) => Tasks.Remove(item);
+        public int Count => Tasks.Count;
+        public bool IsReadOnly => false;
+        public int IndexOf(QueueTask item) => Tasks.IndexOf(item);
+        public void Insert(int index, QueueTask item) => Tasks.Insert(index, item);
+        public void RemoveAt(int index) => Tasks.RemoveAt(index);
 
         public QueueTask this[int index]
         {
-            get { return tasks[index]; }
-            set { tasks[index] = value; }
-
+            get { return Tasks[index]; }
+            set { Tasks[index] = value; }
         }
+
+        public TaskStore(IQueueDBContext context)
+        {
+            this.context = context;
+        }
+
+        public int SaveChanges()=> context.SaveChanges();
     }
 }
