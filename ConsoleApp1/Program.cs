@@ -15,7 +15,7 @@ namespace ConsoleApp1
 
             for (int i = 0; i < 20; i++)
             {
-                mySyppQueue.Add(new Task((int)SuperTaskTypes.MySuperTaskWrapper, Encoding.UTF8.GetBytes("Helo world queue. Handle task [#] " + i.ToString())));
+                mySyppQueue.AddTask(new Task((int)SuperTaskTypes.MySuperTaskWrapper, Encoding.UTF8.GetBytes("Helo world queue. Handle task [#] " + i.ToString())));
             }
 
             Console.Read();

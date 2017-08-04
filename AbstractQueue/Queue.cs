@@ -8,19 +8,54 @@ namespace AbstractQueue
 {
   public  class Queue
     {
+        /// <summary>
+        /// Count workers.
+        /// </summary>
         private readonly int ThreadCount;
+        /// <summary>
+        /// Executeble task array.
+        /// </summary>
         private readonly Task[] Tasks;
+        /// <summary>
+        /// Concrete executer
+        /// </summary>
         private readonly AbstractTaskExecuter Executer;
-        private readonly Store store;
+
+        private readonly bool _isHandleFailed;
+        private readonly int _countHandleFailed;
+
+        /// <summary>
+        /// Task _taskStore.
+        /// </summary>
+        private readonly TaskStore _taskStore;
 
         public Queue(int threadCount, AbstractTaskExecuter executer)
         {
             ThreadCount = threadCount;
             Tasks = new Task[threadCount];
             Executer = executer;
-            store = new Store();
+            _taskStore = new TaskStore();
+            _isHandleFailed = false;
+            _countHandleFailed = -1;
         }
 
+       
+
+        public Queue(int threadCount, AbstractTaskExecuter executer, bool isHandleFailed, int countHandleFailed)
+        {
+            ThreadCount = threadCount;
+            Tasks = new Task[threadCount];
+            Executer = executer;
+            _isHandleFailed = isHandleFailed;
+            _countHandleFailed = countHandleFailed;
+            _taskStore = new TaskStore();
+
+        }
+
+        /// <summary>
+        /// Executed task handler.
+        /// </summary>
+        /// <param name="task"></param>
         private void Task_ExecutedTask(Task task)
         {
             if (task.ETaskStatus == ETaskStatus.InProcces)
@@ -35,6 +70,7 @@ namespace AbstractQueue
 
             TryStartTask();
         }
+
 
         private void TryStartTask()
         {
@@ -54,18 +90,23 @@ namespace AbstractQueue
             }
         }
 
-        public int Add(Task task)
+        public int AddTask(Task task)
         {
-            store.Add(task);
+            _taskStore.Add(task);
             TryStartTask();
-            return store.IndexOf(task);
+            return _taskStore.IndexOf(task);
         }
 
+        /// <summary>
+        /// Check executeble task and return boolean value and task index.
+        /// </summary>
+        /// <param name="isCan"></param>
+        /// <param name="index"></param>
         private void IsCanExecuteTask(out bool isCan, out int index)
         {
             index = -1;
-            int countExecuteTasks = store.Count(each => each?.ETaskStatus == ETaskStatus.InProcces);
-            var task = store.FirstOrDefault(each => each.ETaskStatus == ETaskStatus.Created);
+            int countExecuteTasks = _taskStore.Count(each => each?.ETaskStatus == ETaskStatus.InProcces);
+            var task = _taskStore.FirstOrDefault(each => each.ETaskStatus == ETaskStatus.Created);
             isCan = countExecuteTasks < ThreadCount && task != null;
             if (isCan)
                 for (index = 0; index < Tasks.Length; index++)
