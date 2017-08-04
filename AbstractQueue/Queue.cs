@@ -103,22 +103,31 @@ namespace AbstractQueue
         private void IsCanExecuteTask(out bool isCan, out int index)
         {
             index = -1;
-            int countExecuteTasks = QueueTasks.Count(each => each?.QueueTaskStatus == QueueTaskStatus.InProcces);
+            int countExecuteTasks = QueueTasks.Count(each => CheckQueueTaskStatus(each, _isHandleFailed));
 
-           
-
-            var task = _taskStore.FirstOrDefault(each => each.QueueTaskStatus == QueueTaskStatus.Created);
+            var task = _taskStore.FirstOrDefault(each => CheckQueueTaskStatus(each , _isHandleFailed));
             isCan = countExecuteTasks < ThreadCount && task != null;
             if (isCan)
                 for (index = 0; index < ThreadCount; index++)
                 {
-                    var each = QueueTasks[index];
-                    if (each == null || each?.QueueTaskStatus == QueueTaskStatus.Created)
+                    var currentWorker = QueueTasks[index];
+                    if (currentWorker == null || currentWorker?.QueueTaskStatus == QueueTaskStatus.Created)
                     {
                         QueueTasks[index] = task;
                         return;
                     }
                 }
+        }
+
+        private bool CheckQueueTaskStatus(QueueTask task, bool isHandleFailed )
+        {
+            //if (task == null)
+            //    return true;
+
+            if (isHandleFailed)
+                return task?.QueueTaskStatus == QueueTaskStatus.Created || task.QueueTaskStatus == QueueTaskStatus.Failed;
+            else
+                return task?.QueueTaskStatus == QueueTaskStatus.Created;
         }
 
          
