@@ -29,7 +29,7 @@ namespace AbstractQueue
         /// </summary>
         private readonly TaskStore _taskStore;
 
-        public Queue(int threadCount, AbstractTaskExecuter executer)
+        private Queue(int threadCount, AbstractTaskExecuter executer)
         {
             ThreadCount = threadCount;
             QueueTasks = new QueueTask[threadCount];
@@ -41,7 +41,7 @@ namespace AbstractQueue
 
        
 
-        public Queue(int threadCount, AbstractTaskExecuter executer, bool isHandleFailed, int countHandleFailed)
+        private Queue(int threadCount, AbstractTaskExecuter executer, bool isHandleFailed, int countHandleFailed)
         {
             ThreadCount = threadCount;
             QueueTasks = new QueueTask[threadCount];
@@ -52,6 +52,7 @@ namespace AbstractQueue
 
         }
 
+     
         /// <summary>
         /// Executed queueTask handler.
         /// </summary>
@@ -64,6 +65,7 @@ namespace AbstractQueue
                 queueTask.ExecutedDate = DateTime.Now;
             }
             TryStartTask();
+            
         }
 
 
@@ -130,6 +132,32 @@ namespace AbstractQueue
                 return task?.QueueTaskStatus == QueueTaskStatus.Created;
         }
 
-         
+        #region Factory methods
+       
+        /// <summary>
+        /// Create Queue which the try handle failed task n times.
+        /// </summary>
+        /// <param name="threadCount"></param>
+        /// <param name="executer"></param>
+        /// <param name="isHandleFailed"></param>
+        /// <param name="countHandleFailed"></param>
+        /// <returns></returns>
+        public static Queue CreateQueueHandleFailed(int threadCount, AbstractTaskExecuter executer, bool isHandleFailed,
+            int countHandleFailed)
+        {
+            return new Queue(threadCount, executer, isHandleFailed, countHandleFailed);
+        }
+
+        /// <summary>
+        /// Create Queue.
+        /// </summary>
+        /// <param name="threadCount"></param>
+        /// <param name="executer"></param>
+        /// <returns></returns>
+        public static Queue CreateQueue(int threadCount, AbstractTaskExecuter executer)
+        {
+            return new Queue(threadCount, executer);
+        }
+        #endregion
     }
 }
