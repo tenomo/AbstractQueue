@@ -5,7 +5,7 @@ using System.ComponentModel.DataAnnotations.Schema;
 namespace AbstractQueue
 {
     [Serializable]
-    public sealed class QueueTask : IExecutedTask, IQueueName
+    public sealed class QueueTask :  IQueueName
     {
         /// <summary>
         /// QueueTask id.
@@ -32,17 +32,7 @@ namespace AbstractQueue
 
 
 
-        public void SetFailed()
-        {
-            QueueTaskStatus = QueueTaskStatus.Failed;
-            OnExecutedTask(QueueTaskStatus);
-        }
-
-        public void SetSuccess()
-        {
-            QueueTaskStatus = QueueTaskStatus.Success;
-            OnExecutedTask(QueueTaskStatus);
-        }
+       
 
         /// <summary>
         /// QueueTask type for determinate the executer(custom value).
@@ -54,10 +44,7 @@ namespace AbstractQueue
         /// </summary>
         public string Body { get; set; }
 
-        /// <summary>
-        /// Ovserve about executed the task.
-        /// </summary>
-        public event Action<QueueTask> ExecutedTask;
+       
 
         /// <summary>
         /// Date of creation task.
@@ -94,11 +81,6 @@ namespace AbstractQueue
         }
 
 
-        private void OnExecutedTask(QueueTaskStatus taskStatus)
-        {
-            if (taskStatus == QueueTaskStatus.Failed || taskStatus == QueueTaskStatus.Success)
-                ExecutedTask?.Invoke(this);
-
-        }
+       
     }
 }

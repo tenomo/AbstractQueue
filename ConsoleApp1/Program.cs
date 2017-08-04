@@ -11,12 +11,12 @@ namespace ConsoleApp1
     {
         static void Main(string[] args)
         {
-            Queue mySyppQueue =   Queue.CreateQueue(3, new MySuperExecuter());
+       //     Queue mySyppQueue =   Queue.CreateQueue(3, new MySuperExecuter());
 
             for (int i = 0; i < 20; i++)
             {
                 string id = i.ToString();
-                new TaskFactory().StartNew(() => { mySyppQueue.AddTask(new QueueTask((int)SuperTaskTypes.MySuperTaskWrapper, Encoding.UTF8.GetBytes("Helo world queue. Handle queueTask [#] " + id.ToString()))); });
+               // new TaskFactory().StartNew(() => { mySyppQueue.AddTask(new QueueTask((int)SuperTaskTypes.MySuperTaskWrapper, Encoding.UTF8.GetBytes("Helo world queue. Handle queueTask [#] " + id.ToString()))); });
                
             }
 
@@ -32,13 +32,13 @@ namespace ConsoleApp1
                     case ((int)SuperTaskTypes.MySuperTaskWrapper):
                         try
                         {
-                            Console.WriteLine(Encoding.UTF8.GetString(queueTask.Body)); 
-                            queueTask.SetSuccess();
+                         //   Console.WriteLine(Encoding.UTF8.GetString(queueTask.Body)); 
+                            this.TaskStore.SetSuccess(queueTask);
                         }
                         catch (Exception e)
                         {
                             Console.WriteLine(e);
-                            queueTask.SetFailed();
+                            this.TaskStore.SetFailed(queueTask);
                         }
                     
                         break;

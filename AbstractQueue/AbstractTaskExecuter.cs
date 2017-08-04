@@ -3,6 +3,7 @@
 
     public abstract class AbstractTaskExecuter
     {
+        public ITaskStore TaskStore { get; internal set; }
 
         /// <summary>
         /// Execute queueTask.

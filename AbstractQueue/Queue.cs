@@ -88,12 +88,12 @@ namespace AbstractQueue
                 {
                     try
                     {
-                        executeTask.ExecutedTask += Task_ExecutedTask;
+                        _taskStore.ExecutedTask += Task_ExecutedTask;
                         Executer.Execute(executeTask);
                     }
                     catch 
                     {
-                        executeTask.SetFailed();
+                        _taskStore.SetFailed(executeTask);
                     }
 
                 });

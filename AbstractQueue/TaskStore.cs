@@ -7,7 +7,7 @@ using System.Threading.Tasks;
 
 namespace AbstractQueue
 {
-    public sealed class TaskStore : IList<QueueTask>, SaveChanges
+    public sealed class TaskStore : IList<QueueTask>, ITaskStore
     {
         private readonly IQueueDBContext context;
 
@@ -49,5 +49,27 @@ namespace AbstractQueue
         }
 
         public int SaveChanges()=> context.SaveChanges();
+
+        public void SetFailed(QueueTask task)
+        {
+            if (task.QueueTaskStatus == QueueTaskStatus.Failed || task.QueueTaskStatus == QueueTaskStatus.Success)
+                ExecutedTask?.Invoke(task);
+        }
+
+        public void SetSuccess(QueueTask task)
+        {
+            if(task.QueueTaskStatus == QueueTaskStatus.Failed || task.QueueTaskStatus == QueueTaskStatus.Success)
+                ExecutedTask?.Invoke(task);
+        }
+
+        public void SetProcces(QueueTask task)
+        {
+            if (task.QueueTaskStatus == QueueTaskStatus.Created)
+                ExecutedTask?.Invoke(task);
+            else
+                throw new OperationCanceledException("The task is already completed");
+        }
+
+        public event Action<QueueTask> ExecutedTask;
     }
 }
