@@ -1,4 +1,6 @@
-﻿namespace AbstractQueue
+﻿using AbstractQueue.QueueData;
+
+namespace AbstractQueue
 {
   public static class QueueFactory
     {
@@ -11,9 +13,9 @@
         /// <param name="countHandleFailed"></param>
         /// <returns></returns>
         public static IQueue CreateQueueHandleFailed(int threadCount, AbstractTaskExecuter executer,
-            int countHandleFailed, IQueueDBContext queueDbContext)
+            int countHandleFailed, IQueueDBContext queueDbContext, string queueName)
         {
-            return new Queue(threadCount, executer, queueDbContext, countHandleFailed);
+            return new Queue(threadCount, executer, queueDbContext, queueName, countHandleFailed);
         }
 
         /// <summary>
@@ -22,9 +24,9 @@
         /// <param name="threadCount"></param>
         /// <param name="executer"></param>
         /// <returns></returns>
-        public static IQueue CreateQueue(int threadCount, AbstractTaskExecuter executer, IQueueDBContext queueDbContext)
+        public static IQueue CreateQueue(int threadCount, AbstractTaskExecuter executer, IQueueDBContext queueDbContext, string queueName)
         {
-            return new Queue(threadCount, executer, queueDbContext);
+            return new Queue(threadCount, executer, queueDbContext, queueName);
         }
     }
 }

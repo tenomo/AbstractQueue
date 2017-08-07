@@ -4,7 +4,7 @@ using Microsoft.VisualStudio.TestTools.UnitTesting;
 namespace AbstractQueueUnitTests
 {
     [TestClass]
-    public class UnitTest1
+    public class Queue_Tests
     {
         [TestMethod]
         public void TestMethod1()

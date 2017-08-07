@@ -1,4 +1,6 @@
-﻿namespace AbstractQueue
+﻿using AbstractQueue.TaskStore;
+
+namespace AbstractQueue
 {
 
     public abstract class AbstractTaskExecuter

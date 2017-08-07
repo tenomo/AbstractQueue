@@ -1,8 +1,7 @@
 ﻿using System;
-using System.Collections.Generic;
 using System.Linq;
-using System.Text;
 using System.Threading.Tasks;
+using AbstractQueue.QueueData;
 
 namespace AbstractQueue
 { 
@@ -28,7 +27,7 @@ namespace AbstractQueue
         /// <summary>
         /// QueueTask TaskStore.
         /// </summary>
-        private readonly TaskStore TaskStore;
+        private readonly  TaskStore.TaskStore TaskStore;
 
         public int CountHandleFailed
         {
@@ -46,33 +45,23 @@ namespace AbstractQueue
             }
         }
 
-
-     
-
-
-     
-
-        internal Queue(int threadCount, AbstractTaskExecuter executer , IQueueDBContext queueDbContext)
+        internal Queue(int threadCount, AbstractTaskExecuter executer , IQueueDBContext queueDbContext, string queueName)
         {
+            QueueName = queueName; 
             ThreadCount = threadCount;
             QueueTasks = new QueueTask[threadCount];
             Executer = executer;
-            TaskStore = new TaskStore(queueDbContext);
+            TaskStore = new TaskStore.TaskStore(queueDbContext);
 
             _isHandleFailed = false;
             _countHandleFailed = -1;
 
             executer.TaskStore = TaskStore;
         }
-
-       
-
-        internal Queue(int threadCount, AbstractTaskExecuter executer , IQueueDBContext queueDbContext, int countHandleFailed) : this(threadCount, executer  ,queueDbContext)
+        internal Queue(int threadCount, AbstractTaskExecuter executer , IQueueDBContext queueDbContext, string queueName, int countHandleFailed) : this(threadCount, executer  ,queueDbContext, queueName)
         {
             CountHandleFailed = countHandleFailed;
         }
-
-     
         /// <summary>
         /// Executed queueTask handler.
         /// </summary>
@@ -87,10 +76,8 @@ namespace AbstractQueue
                 TaskStore.SaveChanges();
                 ExecutedTask?.Invoke(queueTask);
             }
-            TryStartTask();
-            
+            TryStartTask(queueTask.TaskIdInQueue);
         }
-
 
         private void TryStartTask()
         {
@@ -117,7 +104,31 @@ namespace AbstractQueue
 
                 });
             }
-            
+        }
+
+        private void TryStartTask(int index)
+        {
+            bool isCan = false; 
+            IsCanExecuteTask(out isCan, index);
+            if (isCan)
+            {
+                var executeTask = QueueTasks[index];
+
+                executeTask.QueueTaskStatus = executeTask.QueueTaskStatus == QueueTaskStatus.Created ? QueueTaskStatus.InProcces : QueueTaskStatus.TryFailInProcces;
+                TaskStore.SaveChanges();
+                new TaskFactory().StartNew(() =>
+                {
+                    try
+                    {
+                        TaskStore.ExecutedTask += Task_ExecutedTask;
+                        Executer.Execute(executeTask);
+                    }
+                    catch
+                    {
+                        TaskStore.SetFailed(executeTask);
+                    }
+                });
+            }
         }
 
         public int AddTask(QueueTask queueTask)
@@ -149,11 +160,31 @@ namespace AbstractQueue
                     { 
                          
                         QueueTasks[index] = task;
+                        QueueTasks[index].TaskIdInQueue = index;
                         return;
                     }
                 }
         }
 
+        /// <summary>
+        /// Check executeble queueTask by on executed task place and return boolean.
+        /// </summary>
+        /// <param name="isCan"></param>
+        /// <param name="index"></param>
+        /// <param name="index"></param>
+        private void IsCanExecuteTask(out bool isCan,  int index)
+        {
+            
+            int countExecuteTasks = QueueTasks.Count(CheckQueueTaskStatus);
+            var task = TaskStore.FirstOrDefault(each => CheckQueueTaskStatus(each) && each.QueueName == QueueName);
+
+            isCan = countExecuteTasks < ThreadCount && task != null;
+            if (isCan)
+            {
+                QueueTasks[index] = task;
+                QueueTasks[index].TaskIdInQueue = index;
+            }
+        }
         private bool CheckQueueTaskStatus(QueueTask task  )
         {
             if (_isHandleFailed)
