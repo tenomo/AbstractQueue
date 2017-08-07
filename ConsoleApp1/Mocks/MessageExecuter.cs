@@ -6,7 +6,7 @@ using System.Threading.Tasks;
 using AbstractQueue;
 using System.Threading;
 
-namespace AbstractQueueUnitTests.Mocks
+namespace ConsoleApp1.Mocks
 {
     class MessageExecuter : AbstractTaskExecuter
     {
@@ -21,7 +21,7 @@ namespace AbstractQueueUnitTests.Mocks
                    break;
                 case ((int)MessageTypes.B):
                     Thread.Sleep(3000);
-                    MessageState.MessageB = MessageState.MessageB_Ideal;
+                    MessageState.MessageA = MessageState.MessageB_Ideal;
                     this.TaskStore.SetSuccess(queueTask);
                     break;
                 case ((int)MessageTypes.C):

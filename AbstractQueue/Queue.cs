@@ -162,6 +162,7 @@ namespace AbstractQueue
                          
                         QueueTasks[index] = task;
                         QueueTasks[index].TaskIdInQueue = index;
+                        TaskStore.SaveChanges();
                         return;
                     }
                 }
@@ -184,6 +185,7 @@ namespace AbstractQueue
             {
                 QueueTasks[index] = task;
                 QueueTasks[index].TaskIdInQueue = index;
+                TaskStore.SaveChanges();
             }
         }
         private bool CheckQueueTaskStatus(QueueTask task  )

@@ -7,15 +7,13 @@ using System.Threading.Tasks;
 using AbstractQueue;
 using AbstractQueue.QueueData;
 
-namespace AbstractQueueUnitTests.Mocks
+namespace ConsoleApp1.Mocks
 {
   public  class QueueDBContext : DbContext, IQueueDBContext
     {
         public DbSet<QueueTask> Tasks { get; set; }
 
-        public QueueDBContext() :base("DefaultConnection" )
-        {
-                
-        }
+        
+       
     }
 }

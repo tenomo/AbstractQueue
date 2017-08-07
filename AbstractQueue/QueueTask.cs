@@ -61,20 +61,22 @@ namespace AbstractQueue
             get { return _attempt; }
             set
             {
-                if (QueueTaskStatus != QueueTaskStatus.Failed)
+                if (_attempt >0 && QueueTaskStatus != QueueTaskStatus.Failed)
                     throw new InvalidOperationException(
                         $"Failed {value} attempt, task must be have failed status, check logic");
                 _attempt = value;
             }
         }
 
-        public QueueTask(byte type, string body )
+        public static  QueueTask Create(byte type, string body )
         {
-            QueueTaskStatus = QueueTaskStatus.Created;
-            Type = type;
-            Body = body;
-            CreationDate = DateTime.Now;
-           
+            return new QueueTask()
+            {
+                QueueTaskStatus = QueueTaskStatus.Created,
+                Type = type,
+                Body = body,
+                CreationDate = DateTime.Now,
+            };
         }
 
 
