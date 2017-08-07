@@ -6,6 +6,7 @@ namespace AbstractQueueUnitTests
     [TestClass]
     public class Queue_Tests
     {
+
         [TestMethod]
         public void TestMethod1()
         {

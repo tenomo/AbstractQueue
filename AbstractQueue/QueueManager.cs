@@ -7,11 +7,14 @@ using System.Threading.Tasks;
 
 namespace AbstractQueue
 {
-  public  class QueueManager
+    public sealed  class QueueManager  
     {
 
         /// защищённый конструктор нужен, чтобы предотвратить создание экземпляра класса Singleton
-        protected QueueManager(){ queues = new Dictionary<string, IQueue>();}
+        protected QueueManager()
+        {
+            queues = new Dictionary<string, IQueue>();
+        }
 
         private sealed class QueueManagerCreator
         {
@@ -19,7 +22,7 @@ namespace AbstractQueue
             public static QueueManager Instance => instance;
         }
 
-         
+
         public static QueueManager Kernel => QueueManagerCreator.Instance;
 
 
@@ -27,10 +30,30 @@ namespace AbstractQueue
 
         public void RegistrateQueue(IQueue queue)
         {
-            queues.Add(queue.QueueName,queue);
+            queues.Add(queue.QueueName, queue);
         }
 
-    public IQueue this[string QueueName] => queues[QueueName];
+        public void DeleteQueue(string queueName)
+        {
+            queues.Remove(queueName);
+        }
+
+        public void DeleteQueue(params string[] queueNames)
+        {
+            foreach (var queueName in queueNames)
+            {
+                DeleteQueue(queueNames);
+            }
+   
+        }
+
+        public int QueuesCount => queues.Count;
+
+        public IQueue this[string QueueName] => queues[QueueName];
+
+     
+
+
     }
 }
  
