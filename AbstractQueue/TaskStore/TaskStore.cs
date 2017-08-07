@@ -45,32 +45,49 @@ namespace AbstractQueue.TaskStore
         internal TaskStore(IQueueDBContext context)
         {
             this.context = context;
+            ExecutedTaskEvent += TaskStore_SetStatus;
+            FailedExecuteTaskEvent += TaskStore_SetStatus;
+            InProccesTaskEvent += TaskStore_SetStatus;
+        }
+
+        private void TaskStore_SetStatus(QueueTask obj)
+        {
+            SaveChanges();
         }
 
         public int SaveChanges()=> context.SaveChanges();
 
         public void SetFailed(QueueTask task)
         {
-            if (task.QueueTaskStatus == QueueTaskStatus.Failed || task.QueueTaskStatus == QueueTaskStatus.Success)
-                ExecutedTask?.Invoke(task);
+             task.QueueTaskStatus = QueueTaskStatus.Failed;
+         FailedExecuteTaskEvent?.Invoke(task);
+            
         }
 
         public void SetSuccess(QueueTask task)
         {
-            if(task.QueueTaskStatus == QueueTaskStatus.Failed || task.QueueTaskStatus == QueueTaskStatus.Success)
-                ExecutedTask?.Invoke(task);
+            
+                task.QueueTaskStatus = QueueTaskStatus.Success;
+            task.ExecutedDate = DateTime.Now;
+            ExecutedTaskEvent?.Invoke(task);
+             
         }
 
         internal void SetProcces(QueueTask task)
         {
-            if (task.QueueTaskStatus == QueueTaskStatus.Created)
-                ExecutedTask?.Invoke(task);
-            else
-                throw new OperationCanceledException("The task is already completed");
+
+            task.QueueTaskStatus = QueueTaskStatus.InProcces;
+
+            InProccesTaskEvent?.Invoke(task);
+
+
         }
 
-       
 
-        public event Action<QueueTask> ExecutedTask;
+
+        public event Action<QueueTask> ExecutedTaskEvent ;
+        public event Action<QueueTask> FailedExecuteTaskEvent;
+        public event Action<QueueTask> InProccesTaskEvent;
+
     }
 }

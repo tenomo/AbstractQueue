@@ -59,6 +59,10 @@
     <Compile Include="Migrations\201708070955248_one.Designer.cs">
       <DependentUpon>201708070955248_one.cs</DependentUpon>
     </Compile>
+    <Compile Include="Migrations\201708071253339_update_Date.cs" />
+    <Compile Include="Migrations\201708071253339_update_Date.Designer.cs">
+      <DependentUpon>201708071253339_update_Date.cs</DependentUpon>
+    </Compile>
     <Compile Include="Migrations\Configuration.cs" />
     <Compile Include="Mocks\QueueDBContext.cs" />
     <Compile Include="Mocks\JsonDataExecuter.cs" />
@@ -80,6 +84,9 @@
   <ItemGroup>
     <EmbeddedResource Include="Migrations\201708070955248_one.resx">
       <DependentUpon>201708070955248_one.cs</DependentUpon>
+    </EmbeddedResource>
+    <EmbeddedResource Include="Migrations\201708071253339_update_Date.resx">
+      <DependentUpon>201708071253339_update_Date.cs</DependentUpon>
     </EmbeddedResource>
   </ItemGroup>
   <Import Project="$(VSToolsPath)\TeamTest\Microsoft.TestTools.targets" Condition="Exists('$(VSToolsPath)\TeamTest\Microsoft.TestTools.targets')" />

@@ -52,12 +52,16 @@ namespace AbstractQueue
             QueueWorkers = new QueueTask[queueWorkerCount];
             Executer = executer;
             TaskStore = new TaskStore.TaskStore(queueDbContext);
-
+            TaskStore.ExecutedTaskEvent += TaskEventExecuted;
+            TaskStore.FailedExecuteTaskEvent += TaskEventExecuted;
             _isHandleFailed = false;
             _countHandleFailed = -1;
 
             executer.TaskStore = TaskStore;
         }
+
+       
+
         internal Queue(int queueWorkerCount, AbstractTaskExecuter executer , IQueueDBContext queueDbContext, string queueName, int countHandleFailed) : this(queueWorkerCount, executer  ,queueDbContext, queueName)
         {
             CountHandleFailed = countHandleFailed;
@@ -66,17 +70,13 @@ namespace AbstractQueue
         /// Executed queueTask handler.
         /// </summary>
         /// <param name="queueTask"></param>
-        private void Task_ExecutedTask(QueueTask queueTask)
-        {
-            TaskStore.SetSuccess(queueTask);
-                queueTask.QueueTaskStatus = QueueTaskStatus.Success;
-                queueTask.ExecutedDate = DateTime.Now;
-                TaskStore.SaveChanges();
-                ExecutedTask?.Invoke(queueTask);
+        private void TaskEventExecuted(QueueTask queueTask)
+        { 
+                ExecutedTaskEvent?.Invoke(queueTask);
             TryStartTask(queueTask.TaskIdInQueue);
         }
 
- 
+       
         public int AddTask(QueueTask queueTask)
         {
             queueTask.QueueName = QueueName;
@@ -105,10 +105,8 @@ namespace AbstractQueue
                 {
                     try
                     {
-
-                        TaskStore.ExecutedTask += Task_ExecutedTask;
                         Executer.Execute(executeTask);
-
+                        TaskStore.SetSuccess(executeTask);
                     }
                     catch
                     {
@@ -136,11 +134,12 @@ namespace AbstractQueue
                 {
                     try
                     {
-                        TaskStore.ExecutedTask += Task_ExecutedTask;
+                        TaskStore.ExecutedTaskEvent += TaskEventExecuted;
                         Executer.Execute(executeTask);
                     }
                     catch
                     {
+                        Logger.Log("Exception at try");
                         TaskStore.SetFailed(executeTask);
                     }
                 });
@@ -205,6 +204,7 @@ namespace AbstractQueue
         {
             if (_isHandleFailed)
             {
+
                 if (task != null &&
                     (task?.QueueTaskStatus == QueueTaskStatus.Created || task.QueueTaskStatus == QueueTaskStatus.Failed))
 
@@ -231,13 +231,13 @@ namespace AbstractQueue
         {
 
             task.Attempt += 1;
-            System.Diagnostics.Debug.WriteLine("UpAttempt " + task.Attempt);
+            System.Diagnostics.Debug.WriteLine("UpAttempt for task id" + task.Id + ", Attempt #" + task.Attempt);
             TaskStore.SaveChanges();
         }
 
 
 
-        public event Action<QueueTask> ExecutedTask;
+        public event Action<QueueTask> ExecutedTaskEvent;
         public string QueueName { get; set; }
 
       

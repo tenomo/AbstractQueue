@@ -53,6 +53,7 @@
     <Compile Include="QueueData\IQueueDBContext.cs" />
     <Compile Include="IQueueName.cs" />
     <Compile Include="QueueManager.cs" />
+    <Compile Include="Logger.cs" />
     <Compile Include="TaskStore\ITaskStore.cs" />
     <Compile Include="QueueFactory.cs" />
     <Compile Include="QueueTaskStatus.cs" />

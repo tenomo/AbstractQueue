@@ -7,7 +7,7 @@ namespace AbstractQueue
         int CountHandleFailed { get; }
         string QueueName { get; set; }
 
-        event Action<QueueTask> ExecutedTask;
+        event Action<QueueTask> ExecutedTaskEvent;
 
         int AddTask(QueueTask queueTask);
     }

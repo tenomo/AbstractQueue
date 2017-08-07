@@ -46,20 +46,17 @@ namespace AbstractQueue
         /// <summary>
         /// Date of creation task.
         /// </summary>
-        public DateTime CreationDate;
+        public DateTime CreationDate { get; set; }
 
         /// <summary>
         /// Date of executed task.
         /// </summary>
-        public DateTime ExecutedDate;
+        public DateTime ExecutedDate { get; set; }
 
 
       private  readonly object mLock = new object();
-
-        private byte _attempt = 0;
-
-
-        public byte Attempt
+        private volatile byte _attempt = 0;
+        public   byte Attempt
         {
             get
             {
