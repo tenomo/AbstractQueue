@@ -1,7 +1,6 @@
 ﻿using System.Data.Entity;
-using System.Data.Entity.Infrastructure;
 
-namespace AbstractQueue
+namespace AbstractQueue.QueueData
 {
     public interface IQueueDBContext  : SaveChanges
     {

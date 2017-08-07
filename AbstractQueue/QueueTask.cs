@@ -14,16 +14,13 @@ namespace AbstractQueue
         [Key]
         public int Id { get; set; }
 
-        /// <summary>
-        /// Queue id which the belongs task [Autoincrement]
-        /// </summary>
-        [DatabaseGenerated(DatabaseGeneratedOption.Identity)]
-        public int QueueId { get; set; }
+         
+        public int TaskIdInQueue { get; set; }
 
         /// <summary>
         ///  Queue name which the belongs task.
         /// </summary>
-        public string QueueName { get; set; }
+        public string QueueName { get;   set; }
 
         /// <summary>
         /// QueueTask status.
@@ -49,35 +46,50 @@ namespace AbstractQueue
         /// <summary>
         /// Date of creation task.
         /// </summary>
-        public DateTime CreationDate;
+        public DateTime CreationDate { get; set; }
 
         /// <summary>
         /// Date of executed task.
         /// </summary>
-        public DateTime ExecutedDate;
-
-        private byte _attempt;
+        public DateTime ExecutedDate { get; set; }
 
 
-        public byte Attempt
+      private  readonly object mLock = new object();
+        private volatile byte _attempt = 0;
+        public   byte Attempt
         {
-            get { return _attempt; }
+            get
+            {
+                lock (mLock)
+                {
+                      return _attempt;
+                }
+              
+            }
             set
             {
-                if (QueueTaskStatus != QueueTaskStatus.Failed)
-                    throw new InvalidOperationException(
-                        $"Failed {value} attempt, task must be have failed status, check logic");
-                _attempt = value;
+
+                lock (mLock)
+                {
+                    if (value < 0)
+                        throw new InvalidOperationException(
+                            $"Failed {value} attempt, task must be have failed status, check logic");
+
+                    _attempt = value;
+                }
+              
             }
         }
 
-        public QueueTask(byte type, string body, string queueName)
+        public static  QueueTask Create(byte type, string body )
         {
-            QueueTaskStatus = QueueTaskStatus.Created;
-            Type = type;
-            Body = body;
-            CreationDate = DateTime.Now;
-            QueueName = queueName;
+            return new QueueTask()
+            {
+                QueueTaskStatus = QueueTaskStatus.Created,
+                Type = type,
+                Body = body,
+                CreationDate = DateTime.Now,
+            };
         }
 
 

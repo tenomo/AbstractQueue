@@ -8,25 +8,25 @@
         /// <summary>
         /// Task created and wating.
         /// </summary>
-        Created,
+        Created = 0,
         /// <summary>
         /// Task in procces.
         /// </summary>
-        InProcces,
+        InProcces = 1,
         /// <summary>
         /// Failed executed task.
         /// </summary>
-        Failed,
+        Failed = 3,
         /// <summary>
         /// Success executed task.
         /// </summary>
-        Success,
+        Success = 2,
         /// <summary>
         ///  Not procces task.
         /// </summary>
         NotProccess = Failed | Success | Created,
 
-        TryFailInProcces =  InProcces
+        TryFailInProcces =  InProcces 
 
        
     }
