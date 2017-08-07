@@ -26,7 +26,7 @@
         /// </summary>
         NotProccess = Failed | Success | Created,
 
-        TryFailInProcces =  InProcces 
+        TryFailInProcces =  InProcces  
 
        
     }

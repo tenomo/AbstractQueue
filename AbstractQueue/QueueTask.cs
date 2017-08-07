@@ -61,7 +61,7 @@ namespace AbstractQueue
                 if (value < 0)
                     throw new InvalidOperationException(
                         $"Failed {value} attempt, task must be have failed status, check logic");
-                
+                _attempt = value;
             }
         }
 

@@ -60,6 +60,7 @@ namespace AbstractQueue.TaskStore
         public void SetFailed(QueueTask task)
         {
              task.QueueTaskStatus = QueueTaskStatus.Failed;
+            SaveChanges();
          FailedExecuteTaskEvent?.Invoke(task);
             
         }
@@ -68,7 +69,8 @@ namespace AbstractQueue.TaskStore
         {
             
                 task.QueueTaskStatus = QueueTaskStatus.Success;
-          //  task.ExecutedDate = DateTime.Now;
+            SaveChanges();
+            task.ExecutedDate = DateTime.Now;
             ExecutedTaskEvent?.Invoke(task);
              
         }
@@ -77,7 +79,7 @@ namespace AbstractQueue.TaskStore
         {
 
             task.QueueTaskStatus = QueueTaskStatus.InProcces;
-
+            SaveChanges();
             InProccesTaskEvent?.Invoke(task);
 
 
