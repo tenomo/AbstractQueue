@@ -209,7 +209,7 @@ namespace AbstractQueue
         private bool CheckTaskOnAttemptLimit(QueueTask task)
         {
             if (task == null || _isHandleFailed == false)
-                return false;
+                return true;
             return task.QueueTaskStatus == QueueTaskStatus.Failed && task.Attempt <= CountHandleFailed;
         }
 
