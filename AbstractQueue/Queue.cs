@@ -24,6 +24,11 @@ namespace AbstractQueue
 
         private  bool _isHandleFailed = false;
         private  int _countHandleFailed;
+        
+        /// <summary>
+        /// QueueTask TaskStore.
+        /// </summary>
+        private readonly TaskStore TaskStore;
 
         public int CountHandleFailed
         {
@@ -42,10 +47,7 @@ namespace AbstractQueue
         }
 
 
-        /// <summary>
-        /// QueueTask TaskStore.
-        /// </summary>
-        private readonly TaskStore TaskStore;
+     
 
 
      

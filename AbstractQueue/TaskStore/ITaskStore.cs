@@ -1,6 +1,7 @@
 ﻿using System;
+using AbstractQueue.QueueData;
 
-namespace AbstractQueue
+namespace AbstractQueue.TaskStore
 {
     public interface ITaskStore : SaveChanges, IExecutedTask
     {

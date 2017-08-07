@@ -14,11 +14,8 @@ namespace AbstractQueue
         [Key]
         public int Id { get; set; }
 
-        /// <summary>
-        /// Queue id which the belongs task [Autoincrement]
-        /// </summary>
-        [DatabaseGenerated(DatabaseGeneratedOption.Identity)]
-        public int QueueId { get; set; }
+         
+        public int TaskIdInQueue { get; set; }
 
         /// <summary>
         ///  Queue name which the belongs task.
@@ -71,7 +68,7 @@ namespace AbstractQueue
             }
         }
 
-        public QueueTask(byte type, string body, string queueName)
+        public QueueTask(byte type, string body, string queueName )
         {
             QueueTaskStatus = QueueTaskStatus.Created;
             Type = type;

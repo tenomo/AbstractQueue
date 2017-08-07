@@ -2,10 +2,9 @@
 using System.Collections;
 using System.Collections.Generic;
 using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
+using AbstractQueue.QueueData;
 
-namespace AbstractQueue
+namespace AbstractQueue.TaskStore
 {
     internal sealed class TaskStore : IList<QueueTask>, ITaskStore
     {

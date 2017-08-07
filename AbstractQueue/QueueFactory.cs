@@ -1,6 +1,6 @@
 ﻿namespace AbstractQueue
 {
-    class QueueFactory
+  public static class QueueFactory
     {
         /// <summary>
         /// Create Queue which the try handle failed task n times.
@@ -10,7 +10,7 @@
         /// <param name="isHandleFailed"></param>
         /// <param name="countHandleFailed"></param>
         /// <returns></returns>
-        public static Queue CreateQueueHandleFailed(int threadCount, AbstractTaskExecuter executer,
+        public static IQueue CreateQueueHandleFailed(int threadCount, AbstractTaskExecuter executer,
             int countHandleFailed, IQueueDBContext queueDbContext)
         {
             return new Queue(threadCount, executer, queueDbContext, countHandleFailed);
@@ -22,7 +22,7 @@
         /// <param name="threadCount"></param>
         /// <param name="executer"></param>
         /// <returns></returns>
-        public static Queue CreateQueue(int threadCount, AbstractTaskExecuter executer, IQueueDBContext queueDbContext)
+        public static IQueue CreateQueue(int threadCount, AbstractTaskExecuter executer, IQueueDBContext queueDbContext)
         {
             return new Queue(threadCount, executer, queueDbContext);
         }
