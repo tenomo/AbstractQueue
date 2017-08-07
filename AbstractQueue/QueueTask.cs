@@ -53,18 +53,34 @@ namespace AbstractQueue
         /// </summary>
         public DateTime ExecutedDate;
 
-        private byte _attempt;
+
+      private  readonly object mLock = new object();
+
+        private byte _attempt = 0;
 
 
         public byte Attempt
         {
-            get { return _attempt; }
+            get
+            {
+                lock (mLock)
+                {
+                      return _attempt;
+                }
+              
+            }
             set
             {
-                if (_attempt >0 && QueueTaskStatus != QueueTaskStatus.Failed)
-                    throw new InvalidOperationException(
-                        $"Failed {value} attempt, task must be have failed status, check logic");
-                _attempt = value;
+
+                lock (mLock)
+                {
+                    if (value < 0)
+                        throw new InvalidOperationException(
+                            $"Failed {value} attempt, task must be have failed status, check logic");
+
+                    _attempt = value;
+                }
+              
             }
         }
 

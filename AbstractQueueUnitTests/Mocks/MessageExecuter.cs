@@ -17,21 +17,21 @@ namespace AbstractQueueUnitTests.Mocks
                 case ((int)MessageTypes.A):
                     Thread.Sleep(3000);
                     MessageState.MessageA = MessageState.MessageA_Ideal;
-                    this.TaskStore.SetSuccess(queueTask);
+               
                    break;
                 case ((int)MessageTypes.B):
                     Thread.Sleep(3000);
                     MessageState.MessageB = MessageState.MessageB_Ideal;
-                    this.TaskStore.SetSuccess(queueTask);
+                
                     break;
                 case ((int)MessageTypes.C):
                     Thread.Sleep(3000);
                     MessageState.MessageC =  MessageState.MessageC_Ideal;
-                    this.TaskStore.SetSuccess(queueTask);
+                   
                     break;
                 case ((int)MessageTypes.D):
-                    if (queueTask.Attempt <2)
-                    throw new Exception();
+                    if (queueTask.Attempt < 2)
+                        throw new Exception();
                     else
                     {
                         Thread.Sleep(3000);
