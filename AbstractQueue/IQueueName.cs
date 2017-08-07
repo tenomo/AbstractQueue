@@ -2,6 +2,6 @@
 {
   public  interface IQueueName
     {
-        string QueueName { get; set; }
+        string QueueName { get;  set; }
     }
 }

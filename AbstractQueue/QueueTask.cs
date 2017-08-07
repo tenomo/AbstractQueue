@@ -20,7 +20,7 @@ namespace AbstractQueue
         /// <summary>
         ///  Queue name which the belongs task.
         /// </summary>
-        public string QueueName { get; set; }
+        public string QueueName { get;   set; }
 
         /// <summary>
         /// QueueTask status.
@@ -68,13 +68,13 @@ namespace AbstractQueue
             }
         }
 
-        public QueueTask(byte type, string body, string queueName )
+        public QueueTask(byte type, string body )
         {
             QueueTaskStatus = QueueTaskStatus.Created;
             Type = type;
             Body = body;
             CreationDate = DateTime.Now;
-            QueueName = queueName;
+           
         }
 
 

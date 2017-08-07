@@ -133,6 +133,7 @@ namespace AbstractQueue
 
         public int AddTask(QueueTask queueTask)
         {
+            queueTask.QueueName = QueueName;
             TaskStore.Add(queueTask);
 
             TryStartTask();
