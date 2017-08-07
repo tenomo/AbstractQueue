@@ -14,6 +14,7 @@ namespace AbstractQueue
         protected QueueManager()
         {
             queues = new Dictionary<string, IQueue>();
+            
         }
 
         private sealed class QueueManagerCreator

@@ -7,13 +7,13 @@ namespace AbstractQueueUnitTests.Migrations
     using System.Resources;
     
     [GeneratedCode("EntityFramework.Migrations", "6.2.0-beta1-60406")]
-    public sealed partial class update_Date : IMigrationMetadata
+    public sealed partial class fix : IMigrationMetadata
     {
-        private readonly ResourceManager Resources = new ResourceManager(typeof(update_Date));
+        private readonly ResourceManager Resources = new ResourceManager(typeof(fix));
         
         string IMigrationMetadata.Id
         {
-            get { return "201708071253339_update_Date"; }
+            get { return "201708071420077_fix"; }
         }
         
         string IMigrationMetadata.Source

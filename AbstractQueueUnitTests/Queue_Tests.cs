@@ -21,11 +21,11 @@ namespace AbstractQueueUnitTests
         {
           
             var queue =  QueueFactory.CreateQueue(1, new MessageExecuter(), QueueDbContext, "ExecuteTasks_on_1_Worker");
-            queue.AddTask( QueueTask.Create((int) MessageTypes.A, " " ));
-             queue.AddTask(QueueTask.Create((int)MessageTypes.B, " "));
-             queue.AddTask(QueueTask.Create((int)MessageTypes.C, " "));
-           queue.AddTask(QueueTask.Create((int)MessageTypes.D, " "));
-                 Thread.Sleep(5000);
+            queue.AddTask(QueueTask.Create((int)MessageTypes.A, " "));
+            queue.AddTask(QueueTask.Create((int)MessageTypes.B, " "));
+            queue.AddTask(QueueTask.Create((int)MessageTypes.C, " "));
+            queue.AddTask(QueueTask.Create((int)MessageTypes.D, " "));
+            Thread.Sleep(5000);
                  Assert.AreEqual(MessageState.MessageA_Ideal, MessageState.MessageA);
                     Assert.AreEqual(MessageState.MessageB_Ideal, MessageState.MessageB);
                     Assert.AreEqual(MessageState.MessageC_Ideal, MessageState.MessageC);
@@ -39,7 +39,7 @@ namespace AbstractQueueUnitTests
         {
             
             var queue = QueueFactory.CreateQueue(4, new MessageExecuter(), QueueDbContext, "ExecuteTasks_on_4_Worker");
-            queue.AddTask(QueueTask.Create((int)MessageTypes.A, " "));
+          queue.AddTask(QueueTask.Create((int)MessageTypes.A, " "));
             queue.AddTask(QueueTask.Create((int)MessageTypes.B, " "));
             queue.AddTask(QueueTask.Create((int)MessageTypes.C, " "));
             queue.AddTask(QueueTask.Create((int)MessageTypes.D, " "));

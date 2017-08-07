@@ -55,13 +55,17 @@
     <Reference Include="System.Core" />
   </ItemGroup>
   <ItemGroup>
-    <Compile Include="Migrations\201708070955248_one.cs" />
-    <Compile Include="Migrations\201708070955248_one.Designer.cs">
-      <DependentUpon>201708070955248_one.cs</DependentUpon>
+    <Compile Include="Migrations\201708071410033_init.cs" />
+    <Compile Include="Migrations\201708071410033_init.Designer.cs">
+      <DependentUpon>201708071410033_init.cs</DependentUpon>
     </Compile>
-    <Compile Include="Migrations\201708071253339_update_Date.cs" />
-    <Compile Include="Migrations\201708071253339_update_Date.Designer.cs">
-      <DependentUpon>201708071253339_update_Date.cs</DependentUpon>
+    <Compile Include="Migrations\201708071412420_date-s.cs" />
+    <Compile Include="Migrations\201708071412420_date-s.Designer.cs">
+      <DependentUpon>201708071412420_date-s.cs</DependentUpon>
+    </Compile>
+    <Compile Include="Migrations\201708071420077_fix.cs" />
+    <Compile Include="Migrations\201708071420077_fix.Designer.cs">
+      <DependentUpon>201708071420077_fix.cs</DependentUpon>
     </Compile>
     <Compile Include="Migrations\Configuration.cs" />
     <Compile Include="Mocks\QueueDBContext.cs" />
@@ -72,7 +76,9 @@
     <Compile Include="Properties\AssemblyInfo.cs" />
   </ItemGroup>
   <ItemGroup>
-    <None Include="App.config" />
+    <None Include="App.config">
+      <SubType>Designer</SubType>
+    </None>
     <None Include="packages.config" />
   </ItemGroup>
   <ItemGroup>
@@ -82,11 +88,14 @@
     </ProjectReference>
   </ItemGroup>
   <ItemGroup>
-    <EmbeddedResource Include="Migrations\201708070955248_one.resx">
-      <DependentUpon>201708070955248_one.cs</DependentUpon>
+    <EmbeddedResource Include="Migrations\201708071410033_init.resx">
+      <DependentUpon>201708071410033_init.cs</DependentUpon>
     </EmbeddedResource>
-    <EmbeddedResource Include="Migrations\201708071253339_update_Date.resx">
-      <DependentUpon>201708071253339_update_Date.cs</DependentUpon>
+    <EmbeddedResource Include="Migrations\201708071412420_date-s.resx">
+      <DependentUpon>201708071412420_date-s.cs</DependentUpon>
+    </EmbeddedResource>
+    <EmbeddedResource Include="Migrations\201708071420077_fix.resx">
+      <DependentUpon>201708071420077_fix.cs</DependentUpon>
     </EmbeddedResource>
   </ItemGroup>
   <Import Project="$(VSToolsPath)\TeamTest\Microsoft.TestTools.targets" Condition="Exists('$(VSToolsPath)\TeamTest\Microsoft.TestTools.targets')" />

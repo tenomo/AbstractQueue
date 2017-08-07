@@ -68,7 +68,7 @@ namespace AbstractQueue.TaskStore
         {
             
                 task.QueueTaskStatus = QueueTaskStatus.Success;
-            task.ExecutedDate = DateTime.Now;
+          //  task.ExecutedDate = DateTime.Now;
             ExecutedTaskEvent?.Invoke(task);
              
         }

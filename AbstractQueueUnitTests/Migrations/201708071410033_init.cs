@@ -3,7 +3,7 @@ namespace AbstractQueueUnitTests.Migrations
     using System;
     using System.Data.Entity.Migrations;
     
-    public partial class one : DbMigration
+    public partial class init : DbMigration
     {
         public override void Up()
         {

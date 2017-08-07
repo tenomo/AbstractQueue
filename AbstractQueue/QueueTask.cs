@@ -4,14 +4,14 @@ using System.ComponentModel.DataAnnotations.Schema;
 
 namespace AbstractQueue
 {
-    [Serializable]
-    public sealed class QueueTask :  IQueueName
+  [Serializable]
+    public  sealed class QueueTask :  IQueueName
     {
         /// <summary>
         /// QueueTask id.
         /// </summary>
-        [DatabaseGenerated(DatabaseGeneratedOption.Identity)]
-        [Key]
+         
+       [Key]
         public int Id { get; set; }
 
          
@@ -27,9 +27,7 @@ namespace AbstractQueue
         /// </summary>
         public QueueTaskStatus QueueTaskStatus { get; internal set; }
 
-
-
-       
+        
 
         /// <summary>
         /// QueueTask type for determinate the executer(custom value).
@@ -46,42 +44,28 @@ namespace AbstractQueue
         /// <summary>
         /// Date of creation task.
         /// </summary>
-        public DateTime CreationDate { get; set; }
+        public DateTime? CreationDate { get; set; }
 
         /// <summary>
         /// Date of executed task.
         /// </summary>
-        public DateTime ExecutedDate { get; set; }
+        public DateTime? ExecutedDate { get; set; }
 
+        private byte _attempt;
 
-      private  readonly object mLock = new object();
-        private volatile byte _attempt = 0;
-        public   byte Attempt
+        public byte Attempt 
         {
-            get
-            {
-                lock (mLock)
-                {
-                      return _attempt;
-                }
-              
-            }
+            get { return _attempt; }
             set
             {
-
-                lock (mLock)
-                {
-                    if (value < 0)
-                        throw new InvalidOperationException(
-                            $"Failed {value} attempt, task must be have failed status, check logic");
-
-                    _attempt = value;
-                }
-              
+                if (value < 0)
+                    throw new InvalidOperationException(
+                        $"Failed {value} attempt, task must be have failed status, check logic");
+                
             }
         }
 
-        public static  QueueTask Create(byte type, string body )
+        public static QueueTask Create(byte type, string body)
         {
             return new QueueTask()
             {
@@ -93,6 +77,6 @@ namespace AbstractQueue
         }
 
 
-       
+
     }
 }

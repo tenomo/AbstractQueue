@@ -9,11 +9,13 @@ using AbstractQueue.QueueData;
 
 namespace AbstractQueueUnitTests.Mocks
 {
+    
   public  class QueueDBContext : DbContext, IQueueDBContext
     {
-        public DbSet<QueueTask> Tasks { get; set; }
+             public DbSet<QueueTask> Tasks { get; set; }
 
-        public QueueDBContext() :base("DefaultConnection" )
+       
+        public QueueDBContext() :base("name=DefaultConnection" )
         {
                 
         }
