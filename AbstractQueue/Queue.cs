@@ -27,7 +27,7 @@ namespace AbstractQueue
         /// <summary>
         /// QueueTask TaskStore.
         /// </summary>
-        private readonly  TaskStore.TaskStore TaskStore;
+        private volatile   TaskStore.TaskStore TaskStore;
 
         public int CountHandleFailed
         {
@@ -73,7 +73,7 @@ namespace AbstractQueue
         private void TaskEventExecuted(QueueTask queueTask)
         { 
                 ExecutedTaskEvent?.Invoke(queueTask);
-            TryStartTask(queueTask.TaskIdInQueue);
+            TryStartTask(queueTask.TaskIndexInQueue);
         }
 
        
@@ -81,6 +81,7 @@ namespace AbstractQueue
         {
             queueTask.QueueName = QueueName;
             TaskStore.Add(queueTask);
+        
 
             TryStartTask();
 
@@ -150,23 +151,26 @@ namespace AbstractQueue
         {
              index = 0;
             isCan = false;
-            int countExecuteTasks = QueueWorkers.Count(CheckQueueTaskStatus);
-
-            var task = TaskStore.FirstOrDefault(each => CheckQueueTaskStatus(each ) && each.QueueName == QueueName);
-            isCan = countExecuteTasks < QueueWorkerCount && task != null;
+            var queueWorkers = QueueWorkers;
+            var countExecuteTasks = queueWorkers.Count(CheckQueueTaskStatus);
+            var queueWorkerCount = QueueWorkerCount;
+            //var task =
+            //    TaskStore.GetAll().FirstOrDefault(each => CheckQueueTaskStatus(each) && each.QueueName == QueueName);
+             var task = TaskStore.GetAll().FirstOrDefault(each =>  CheckQueueTaskStatus(each ) && each.QueueName == QueueName);
+            isCan = countExecuteTasks < queueWorkerCount && task != null;
             if (isCan)
             {
 
              
-                for (int i= 0; i < QueueWorkerCount ; i++)
+                for (int i= 0; i < queueWorkerCount; i++)
                 {
                     index = i;
-                    var currentWorker = QueueWorkers[index];
+                    var currentWorker = queueWorkers[index];
                     if (currentWorker == null || CheckQueueTaskStatus(currentWorker) ||
                         CheckTaskOnAttemptLimit(currentWorker))
-                    { 
-                        QueueWorkers[index] = task;
-                        QueueWorkers[index].TaskIdInQueue = index;
+                    {
+                        queueWorkers[index] = task;
+                        queueWorkers[index].TaskIndexInQueue = index;
                         TaskStore.SaveChanges();
                         return;
                     }
@@ -182,20 +186,23 @@ namespace AbstractQueue
         /// <param name="index"></param>
         private void IsCanExecuteTask(out bool isCan,  int index)
         {
+            var queueWorkers = QueueWorkers;
+            var queueWorkerCount = QueueWorkerCount;
             isCan = false;
-            int countExecuteTasks = QueueWorkers.Count(CheckQueueTaskStatus);
-            var task = TaskStore.FirstOrDefault(each => CheckQueueTaskStatus(each) && each.QueueName == QueueName);
+            int countExecuteTasks = queueWorkers.Count(CheckQueueTaskStatus);
+            var task = TaskStore.GetAll().FirstOrDefault(each => CheckQueueTaskStatus(each) && each.QueueName == QueueName);
 
-            isCan = countExecuteTasks < QueueWorkerCount && task != null;
+            isCan = countExecuteTasks < queueWorkerCount && task != null;
             if (isCan)
-            { 
-                   QueueWorkers[index] = task;
-                QueueWorkers[index].TaskIdInQueue = index;
+            {
+                queueWorkers[index] = task;
+                queueWorkers[index].TaskIndexInQueue = index;
                 TaskStore.SaveChanges();
             }
         }
         private bool CheckQueueTaskStatus(QueueTask task  )
         {
+            var _isHandleFailed = this._isHandleFailed;
             if (_isHandleFailed)
             {
 
@@ -208,9 +215,10 @@ namespace AbstractQueue
 
         private bool CheckTaskOnAttemptLimit(QueueTask task)
         {
+            var countHandleFailed = CountHandleFailed;
             if (task == null || _isHandleFailed == false)
                 return true;
-            return task.QueueTaskStatus == QueueTaskStatus.Failed && task.Attempt <= CountHandleFailed;
+            return task.QueueTaskStatus == QueueTaskStatus.Failed && task.Attempt <= countHandleFailed;
         }
 
         private void UpAttempt(QueueTask task)

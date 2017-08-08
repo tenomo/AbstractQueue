@@ -1,45 +1,65 @@
 ﻿using System;
 using System.Collections;
 using System.Collections.Generic;
+using System.Data.Entity;
+using System.Data.Entity.Infrastructure;
 using System.Linq;
+using System.Threading.Tasks;
 using AbstractQueue.QueueData;
 
 namespace AbstractQueue.TaskStore
 {
-    internal sealed class TaskStore : IList<QueueTask>, ITaskStore
+    internal sealed class TaskStore : ITaskStore// :   ITaskStore
     {
-        private readonly IQueueDBContext context;
+        object lockobj = new object();
+        private IQueueDBContext _context;
 
-        private List<QueueTask> Tasks => context.Tasks.ToList();
+        private IQueueDBContext context
+        {
+            get
+            {
+                lock (lockobj)
+                {
+                     return _context;
+                }
+               
+            }
+            set { _context = _context; }
+        }
 
-        public IEnumerator<QueueTask> GetEnumerator() => Tasks.GetEnumerator();
-        IEnumerator IEnumerable.GetEnumerator() => Tasks.GetEnumerator();
+        private IQueryable<QueueTask> Tasks => context.Tasks;
+
+
 
         public void Add(QueueTask item)
         {
-            context.Tasks.Add(item);
-            SaveChanges();
+            lock (lockobj)
+            {
+                context.Tasks.Add(item);
+                SaveChanges();
+            }
         }
+
 
         public void Clear()
         {
-            Tasks.Clear();
-           // context.SaveChanges();
+            Tasks.ToList().Clear();
+            context.SaveChanges();
         }
 
         public bool Contains(QueueTask item) => Tasks.Contains(item);
-        public void CopyTo(QueueTask[] array, int arrayIndex) => Tasks.CopyTo(array, arrayIndex);
-        public bool Remove(QueueTask item) => Tasks.Remove(item);
-        public int Count => Tasks.Count;
+        public void CopyTo(QueueTask[] array, int arrayIndex) => Tasks.ToList().CopyTo(array, arrayIndex);
+ 
+        public int Count => Tasks.ToList().Count;
         public bool IsReadOnly => false;
-        public int IndexOf(QueueTask item) => Tasks.IndexOf(item);
-        public void Insert(int index, QueueTask item) => Tasks.Insert(index, item);
-        public void RemoveAt(int index) => Tasks.RemoveAt(index);
+        public int IndexOf(QueueTask item) => Tasks.ToList().IndexOf(item);
+ 
+   
 
         public QueueTask this[int index]
         {
-            get { return Tasks[index]; }
-            set { Tasks[index] = value; }
+            get { return Tasks.ToList()[index]; }
+            set { Tasks.ToList()[index] = value; }
         }
 
         internal TaskStore(IQueueDBContext context)
@@ -68,24 +88,128 @@ namespace AbstractQueue.TaskStore
 
         public void SetSuccess(QueueTask task)
         {
-            
+            lock (lockobj)
+            {
                 task.QueueTaskStatus = QueueTaskStatus.Success;
-            SaveChanges();
-            task.ExecutedDate = DateTime.Now;
-            ExecutedTaskEvent?.Invoke(task);
+                SaveChanges();
+                task.ExecutedDate = DateTime.Now;
+                ExecutedTaskEvent?.Invoke(task);
+            }
+      
              
         }
 
         internal void SetProcces(QueueTask task)
         {
+            lock (lockobj)
+            {
 
-            task.QueueTaskStatus = QueueTaskStatus.InProcces;
+                task.QueueTaskStatus = QueueTaskStatus.InProcces;
             SaveChanges();
             InProccesTaskEvent?.Invoke(task);
 
+            }
+        }
+         
+         
 
+        public IList<QueueTask> GetAll()
+        {
+            return context.Tasks.ToList();
         }
 
+        public QueueTask GetById(int id)
+        {
+            return context.Tasks.Find(id);
+        }
+
+        public QueueTask GetById(string id)
+        {
+            return context.Tasks.Find(id);
+        }
+
+        public QueueTask Get(QueueTask entity)
+        {
+            return context.Tasks.Find(entity);
+        }
+
+       
+
+        public void Update(QueueTask entity)
+        {
+            bool saveFailed;
+            do
+            {
+                saveFailed = false;
+                try
+                {
+                    context.SaveChanges();
+                }
+                catch (DbUpdateConcurrencyException ex)
+                {
+                    saveFailed = true;
+
+                    // Update original values from the database 
+                    var entry = ex.Entries.Single();
+                    entry.OriginalValues.SetValues(entry.GetDatabaseValues());
+                }
+
+            } while (saveFailed);
+        }
+
+
+     
+
+        public void Delete(QueueTask entity)
+        {
+            //var entityToRemove = Get(entity);
+            context.Tasks.Remove(entity);
+            context.SaveChanges();
+        }
+
+        public void DeleteById(int id)
+        {
+            var entityToRemove = GetById(id);
+            context.Tasks.Remove(entityToRemove);
+            context.SaveChanges();
+        }
+
+        public void DeleteById(string id)
+        {
+            var entityToRemove = GetById(id);
+            context.Tasks.Remove(entityToRemove);
+            context.SaveChanges();
+        }
+
+        public IQueryable<QueueTask> FindBy(System.Linq.Expressions.Expression<Func<QueueTask, bool>> predicate)
+        {
+            var query = context.Tasks.Where(predicate);
+
+            return query;
+        }
+
+        public IQueryable<QueueTask> Where(System.Linq.Expressions.Expression<Func<QueueTask, bool>> predicate)
+        {
+            var query = context.Tasks.Where(predicate);
+            return query;
+        }
+
+        public QueueTask FirstOrDefault(System.Linq.Expressions.Expression<Func<QueueTask, bool>> predicate)
+        {
+            var query = context.Tasks.FirstOrDefault(predicate);
+            return query;
+        }
+
+        public async Task<QueueTask> FirstOrDefaultAsync(System.Linq.Expressions.Expression<Func<QueueTask, bool>> predicate)
+        {
+            var query = await context.Tasks.FirstOrDefaultAsync(predicate);
+            return query;
+        }
+
+        public bool Any(System.Linq.Expressions.Expression<Func<QueueTask, bool>> predicate)
+        {
+            return context.Tasks.Any(predicate);
+        }
 
 
         public event Action<QueueTask> ExecutedTaskEvent ;

@@ -8,12 +8,12 @@ namespace AbstractQueueUnitTests.Migrations
         public override void Up()
         {
             AddColumn("dbo.QueueTasks", "IndexInQueue", c => c.Int(nullable: false));
-            DropColumn("dbo.QueueTasks", "TaskIdInQueue");
+            DropColumn("dbo.QueueTasks", "TaskIndexInQueue");
         }
         
         public override void Down()
         {
-            AddColumn("dbo.QueueTasks", "TaskIdInQueue", c => c.Int(nullable: false));
+            AddColumn("dbo.QueueTasks", "TaskIndexInQueue", c => c.Int(nullable: false));
             DropColumn("dbo.QueueTasks", "IndexInQueue");
         }
     }
