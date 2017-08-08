@@ -20,4 +20,20 @@ namespace AbstractQueueUnitTests.Mocks
                 
         }
     }
+
+    public static class DBSingle
+    {
+        private static QueueDBContext _dbContext;
+
+        public static QueueDBContext DbContext
+        {
+            get
+            {
+                if (_dbContext == null)
+                    _dbContext = new QueueDBContext();
+                return _dbContext;
+            }
+         
+        }
+    }
 }

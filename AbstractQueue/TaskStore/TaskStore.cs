@@ -24,7 +24,7 @@ namespace AbstractQueue.TaskStore
         public void Clear()
         {
             Tasks.Clear();
-            context.SaveChanges();
+           // context.SaveChanges();
         }
 
         public bool Contains(QueueTask item) => Tasks.Contains(item);
@@ -61,7 +61,8 @@ namespace AbstractQueue.TaskStore
         {
              task.QueueTaskStatus = QueueTaskStatus.Failed;
             SaveChanges();
-         FailedExecuteTaskEvent?.Invoke(task);
+            task.ExecutedDate = DateTime.Now;
+            FailedExecuteTaskEvent?.Invoke(task);
             
         }
 

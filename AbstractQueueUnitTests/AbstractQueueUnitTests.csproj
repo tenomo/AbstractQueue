@@ -70,6 +70,14 @@
     <Compile Include="Migrations\201708071420077_fix.Designer.cs">
       <DependentUpon>201708071420077_fix.cs</DependentUpon>
     </Compile>
+    <Compile Include="Migrations\201708080907514_fix1.cs" />
+    <Compile Include="Migrations\201708080907514_fix1.Designer.cs">
+      <DependentUpon>201708080907514_fix1.cs</DependentUpon>
+    </Compile>
+    <Compile Include="Migrations\201708080909367_fix2.cs" />
+    <Compile Include="Migrations\201708080909367_fix2.Designer.cs">
+      <DependentUpon>201708080909367_fix2.cs</DependentUpon>
+    </Compile>
     <Compile Include="Migrations\Configuration.cs" />
     <Compile Include="Mocks\QueueDBContext.cs" />
     <Compile Include="Mocks\NumberCalculateExecuter.cs" />
@@ -99,6 +107,12 @@
     </EmbeddedResource>
     <EmbeddedResource Include="Migrations\201708071420077_fix.resx">
       <DependentUpon>201708071420077_fix.cs</DependentUpon>
+    </EmbeddedResource>
+    <EmbeddedResource Include="Migrations\201708080907514_fix1.resx">
+      <DependentUpon>201708080907514_fix1.cs</DependentUpon>
+    </EmbeddedResource>
+    <EmbeddedResource Include="Migrations\201708080909367_fix2.resx">
+      <DependentUpon>201708080909367_fix2.cs</DependentUpon>
     </EmbeddedResource>
   </ItemGroup>
   <Import Project="$(VSToolsPath)\TeamTest\Microsoft.TestTools.targets" Condition="Exists('$(VSToolsPath)\TeamTest\Microsoft.TestTools.targets')" />
