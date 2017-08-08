@@ -1,5 +1,7 @@
 ﻿using System;
+using System.Collections.Generic;
 using System.Data.Entity;
+using System.Linq;
 using AbstractQueue;
 using AbstractQueueUnitTests.Mocks;
 using Microsoft.VisualStudio.TestTools.UnitTesting;
@@ -59,6 +61,59 @@ namespace AbstractQueueUnitTests
             int ideal = queue_s_Count - 3;
             System.Diagnostics.Debug.WriteLine(ideal);
             Assert.AreEqual(QueueManager.Kernel.QueuesCount , ideal);
+
+        }
+
+        /// <summary>
+        /// Test queue with QueueManager on NumberCalculateExecuter with two workers
+        /// </summary>
+        [TestMethod]
+        public void Test_Queue_QM_On_NumberCalculateExecuter_with_2_Workers()
+        {
+           const string  queueName = "QM_On_NumberCalculateExecuter_2_Workers";
+            var queue = QueueFactory.CreateQueue(2, new NumberCalculateExecuter(), QueueDbContext, queueName);
+            QueueManager.Kernel.RegistrateQueue(queue);
+            
+            var calculationTypeArray  = Enum.GetValues(typeof(CaluculationType)).Cast<CaluculationType>().ToArray();
+            object body;
+            ExecutionResult[] resultList = new ExecutionResult[calculationTypeArray.Length];
+            // build ideal
+            for (int i = 0; i < calculationTypeArray.Length; i++)
+            {
+                if (calculationTypeArray[i] != CaluculationType.Sqrt ||
+                    calculationTypeArray[i] != CaluculationType.Factorial)
+                {
+                    body = new NumberWraper2D  { X =  i * 3,Y= i * 2};
+                }
+                else
+                {
+                    body = new NumberWraper1D { X = i * 3 };
+                }
+                var jsonBody = Newtonsoft.Json.JsonConvert.SerializeObject(body);
+                NumberCalculateExecuter.Calculator(QueueTask.Create((byte) calculationTypeArray[i], jsonBody));
+                 
+            }
+            NumberCalculateExecuter.resultList.CopyTo(resultList);
+            NumberCalculateExecuter.resultList= new List<ExecutionResult>();
+            Assert.AreEqual(0 , NumberCalculateExecuter.resultList.Count);
+
+
+              for (int i = 0; i < calculationTypeArray.Length; i++)
+            {
+                if (calculationTypeArray[i] != CaluculationType.Sqrt ||
+                    calculationTypeArray[i] != CaluculationType.Factorial)
+                {
+                    body = new NumberWraper2D  { X =  i * 3,Y= i * 2};
+                }
+                else
+                {
+                    body = new NumberWraper1D { X = i * 3 };
+                }
+                var jsonBody = Newtonsoft.Json.JsonConvert.SerializeObject(body);
+                QueueManager.Kernel[queueName].AddTask(QueueTask.Create((byte) calculationTypeArray[i], jsonBody));
+
+            }
+
 
         }
     }
