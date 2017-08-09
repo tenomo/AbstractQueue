@@ -2,7 +2,7 @@
 
 namespace AbstractQueue.QueueData
 {
-    class QueueDataBaseContext : DbContext
+   internal class QueueDataBaseContext : DbContext
     {
         /// <summary>
         /// Queue task set.
@@ -10,20 +10,20 @@ namespace AbstractQueue.QueueData
         public DbSet<QueueTask> QueueTasks { get; set; }
         public static string ConnectionName { get; set; } = "DefaultConnection";
 
+        private readonly CreateDatabaseIfNotExists <QueueDataBaseContext> dbInitializerStrategy = new CreateDatabaseIfNotExists<QueueDataBaseContext>();
 
         public QueueDataBaseContext():base(ConnectionName)
-        { 
-            var dbInitializerStrategy = new CreateDatabaseIfNotExists<QueueDataBaseContext>();
-            Database.SetInitializer(new CreateDatabaseIfNotExists<QueueDataBaseContext>());
+        {
+            Database.SetInitializer(dbInitializerStrategy);
 
         }
          
         public QueueDataBaseContext(string connectionName) : base(connectionName)
         {
-            var dbInitializerStrategy = new CreateDatabaseIfNotExists<QueueDataBaseContext>();
-            Database.SetInitializer(new CreateDatabaseIfNotExists<QueueDataBaseContext>());
+            Database.SetInitializer(dbInitializerStrategy);
 
         }
+
          
     }
 }
