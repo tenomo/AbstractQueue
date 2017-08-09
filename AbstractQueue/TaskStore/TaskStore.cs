@@ -23,13 +23,40 @@ namespace AbstractQueue.TaskStore
 
         public void Add(QueueTask item)
         {
-            new TaskFactory().StartNew(() => {
+
+             
                 var context = new QueueDataBaseContext();
                 context.QueueTask.Add(item);
-                context.SaveChanges();
-               // context.Database.Connection.Close();
-            }).Wait();
+                //     context.SaveChanges();
+                // context.Database.Connection.Close();
+                //  }).Wait();
 
+                bool saveFailed;
+                do
+                {
+                    saveFailed = false;
+                    try
+                    {
+
+                        if (item != null)
+                        {
+
+                            context.SaveChanges();
+                            context.Database.Connection.Close();
+                        }
+
+                    }
+                    catch (DbUpdateConcurrencyException ex)
+                    {
+                        saveFailed = true;
+
+                        // Update original values from the database 
+                        var entry = ex.Entries.Single();
+                        entry.OriginalValues.SetValues(entry.GetDatabaseValues());
+                    }
+
+                } while (saveFailed);
+            
         }
 
 

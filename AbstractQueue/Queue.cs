@@ -80,7 +80,7 @@ namespace AbstractQueue
         {
             queueTask.QueueName = QueueName;
             TaskStore.Add(queueTask);
-        
+            
 
             TryStartTask();
 
