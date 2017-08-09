@@ -12,59 +12,59 @@ namespace AbstractQueue.TaskStore
 {
     internal sealed class TaskStore : ITaskStore// :   ITaskStore
     {
+      
 
 
+        private QueueDataBaseContext QDBContex => new QueueDataBaseContext();
 
-        private QueueDataBaseContext QDBContex { get; set; }
-
-        private IQueryable<QueueTask> QueueTasks => QDBContex.QueueTask;
+        private IQueryable<QueueTask> QueueTasks => QDBContex.QueueTasks;
 
 
 
         public void Add(QueueTask item)
         {
 
-             
-                var context = new QueueDataBaseContext();
-                context.QueueTask.Add(item);
-                //     context.SaveChanges();
+
+            var context = QDBContex;
+            context.QueueTasks.Add(item);
+            context.SaveChanges();
                 // context.Database.Connection.Close();
                 //  }).Wait();
 
-                bool saveFailed;
-                do
-                {
-                    saveFailed = false;
-                    try
-                    {
+                //bool saveFailed;
+                //do
+                //{
+                //    saveFailed = false;
+                //    try
+                //    {
 
-                        if (item != null)
-                        {
+                //        if (item != null)
+                //        {
 
-                            context.SaveChanges();
-                            context.Database.Connection.Close();
-                        }
+                //            context.SaveChanges();
+                //            context.Database.Connection.Close();
+                //        }
 
-                    }
-                    catch (DbUpdateConcurrencyException ex)
-                    {
-                        saveFailed = true;
+                //    }
+                //    catch (DbUpdateConcurrencyException ex)
+                //    {
+                //        saveFailed = true;
 
-                        // Update original values from the database 
-                        var entry = ex.Entries.Single();
-                        entry.OriginalValues.SetValues(entry.GetDatabaseValues());
-                    }
+                //        // Update original values from the database 
+                //        var entry = ex.Entries.Single();
+                //        entry.OriginalValues.SetValues(entry.GetDatabaseValues());
+                //    }
 
-                } while (saveFailed);
+                //} while (saveFailed);
             
         }
 
 
         public void Clear()
         {
-           
-            QDBContex.QueueTask.ToList().Clear();
-            QDBContex.SaveChanges();
+            var context = QDBContex;
+            context.QueueTasks.ToList().Clear();
+            context.SaveChanges();
         }
 
         public bool Contains(QueueTask item) => QueueTasks.Contains(item);
@@ -87,7 +87,7 @@ namespace AbstractQueue.TaskStore
             ExecutedTaskEvent += TaskStore_SetStatus;
             FailedExecuteTaskEvent += TaskStore_SetStatus;
             InProccesTaskEvent += TaskStore_SetStatus;
-            QDBContex  = new QueueDataBaseContext();
+            
         }
 
         private void TaskStore_SetStatus(QueueTask obj)
@@ -134,35 +134,37 @@ namespace AbstractQueue.TaskStore
 
         public IList<QueueTask> GetAll()
         {
-            return QDBContex.QueueTask.ToList();
+            return QDBContex.QueueTasks.ToList();
         }
 
         public QueueTask GetById(int id)
         {
-            return QDBContex.QueueTask.Find(id);
+            return QDBContex.QueueTasks.Find(id);
         }
 
         public QueueTask GetById(string id)
         {
-            return QDBContex.QueueTask.Find(id);
+            return QDBContex.QueueTasks.Find(id);
         }
 
         public QueueTask Get(QueueTask entity)
         {
-            return QDBContex.QueueTask.Find(entity);
+            return QDBContex.QueueTasks.Find(entity);
         }
 
        
 
         public void Update(QueueTask entity)
         {
+            var conext = QDBContex;
             bool saveFailed;
             do
             {
                 saveFailed = false;
                 try
                 {
-                    var task = QDBContex.QueueTask.FirstOrDefault(each => each.Id == entity.Id);
+                    
+                    var task = conext.QueueTasks.FirstOrDefault(each => each.Id == entity.Id);
                     if (task != null)
                     {
                         task.QueueTaskStatus = entity.QueueTaskStatus;
@@ -173,7 +175,7 @@ namespace AbstractQueue.TaskStore
                         task.QueueName = entity.QueueName;
                         task.TaskIndexInQueue = entity.TaskIndexInQueue;
                         task.ExecutedDate = entity.ExecutedDate;
-                        QDBContex.SaveChanges();
+                        conext.SaveChanges();
                     }
                      
                 }
@@ -195,7 +197,7 @@ namespace AbstractQueue.TaskStore
         public void Delete(QueueTask entity)
         {
            
-            QDBContex.QueueTask.Remove(entity);
+            QDBContex.QueueTasks.Remove(entity);
             QDBContex.SaveChanges();
         }
 
@@ -204,7 +206,7 @@ namespace AbstractQueue.TaskStore
            
             var entityToRemove = GetById(id);
 
-            QDBContex.QueueTask.Remove(entityToRemove);
+            QDBContex.QueueTasks.Remove(entityToRemove);
             QDBContex.SaveChanges();
         }
 
@@ -212,32 +214,32 @@ namespace AbstractQueue.TaskStore
 
         public IQueryable<QueueTask> FindBy(System.Linq.Expressions.Expression<Func<QueueTask, bool>> predicate)
         {
-            var query = QDBContex.QueueTask.Where(predicate);
+            var query = QDBContex.QueueTasks.Where(predicate);
 
             return query;
         }
 
         public IQueryable<QueueTask> Where(System.Linq.Expressions.Expression<Func<QueueTask, bool>> predicate)
         {
-            var query = QDBContex.QueueTask.Where(predicate);
+            var query = QDBContex.QueueTasks.Where(predicate);
             return query;
         }
 
         public QueueTask FirstOrDefault(System.Linq.Expressions.Expression<Func<QueueTask, bool>> predicate)
         {
-            var query = QDBContex.QueueTask.FirstOrDefault(predicate);
+            var query = QDBContex.QueueTasks.FirstOrDefault(predicate);
             return query;
         }
 
-        //public async Task<QueueTask> FirstOrDefaultAsync(System.Linq.Expressions.Expression<Func<QueueTask, bool>> predicate)
+        //public async Task<QueueTasks> FirstOrDefaultAsync(System.Linq.Expressions.Expression<Func<QueueTasks, bool>> predicate)
         //{
-        //    var query = await QDBContex.QueueTask.FirstOrDefaultAsync(predicate);
+        //    var query = await QDBContex.QueueTasks.FirstOrDefaultAsync(predicate);
         //    return query;
         //}
 
         public bool Any(System.Linq.Expressions.Expression<Func<QueueTask, bool>> predicate)
         {
-            return QDBContex.QueueTask.Any(predicate);
+            return QDBContex.QueueTasks.Any(predicate);
         }
 
 

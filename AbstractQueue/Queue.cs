@@ -26,7 +26,7 @@ namespace AbstractQueue
         private  int _countHandleFailed;
         
         /// <summary>
-        /// QueueTask TaskStore.
+        /// QueueTasks TaskStore.
         /// </summary>
         private volatile   TaskStore.TaskStore TaskStore;
 
@@ -129,11 +129,11 @@ namespace AbstractQueue
                     try
                     {
                         Executer.Execute(executeTask);
-                        executeTask.TaskStore.SetSuccess(executeTask);
+                        TaskStore.SetSuccess(executeTask);
                     }
                     catch
                     {
-                        executeTask.TaskStore.SetFailed(executeTask);
+                        TaskStore.SetFailed(executeTask);
                     }
                 });
             }
@@ -170,8 +170,8 @@ namespace AbstractQueue
                     {
                         queueWorkers[index] = task;
                         queueWorkers[index].TaskIndexInQueue = index;
-                        task.TaskStore = new TaskStore.TaskStore();
-                        task.TaskStore.Update(task);
+                        TaskStore = new TaskStore.TaskStore();
+                        TaskStore.Update(task);
                         return;
                     }
                 }
@@ -195,11 +195,10 @@ namespace AbstractQueue
             isCan = countExecuteTasks < queueWorkerCount && task != null;
             if (isCan)
             {
-                task.TaskStore = queueWorkers[index].TaskStore;
                 queueWorkers[index] = task;
                 queueWorkers[index].TaskIndexInQueue = index;
                 
-                task.TaskStore.Update(task);
+                TaskStore.Update(task);
             }
         }
         private bool CheckQueueTaskStatus(QueueTask task  )
@@ -228,7 +227,7 @@ namespace AbstractQueue
 
             task.Attempt++;
 
-            task.TaskStore.Update(task);
+            TaskStore.Update(task);
         }
 
 

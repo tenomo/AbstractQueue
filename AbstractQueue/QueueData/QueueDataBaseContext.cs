@@ -7,7 +7,7 @@ namespace AbstractQueue.QueueData
         /// <summary>
         /// Queue task set.
         /// </summary>
-        public DbSet<QueueTask> QueueTask { get; set; }
+        public DbSet<QueueTask> QueueTasks { get; set; }
         public static string ConnectionName { get; set; } = "DefaultConnection";
 
 

@@ -26,7 +26,7 @@ namespace AbstractQueue.TaskStore
         void DeleteById(int id); 
         IQueryable<QueueTask> FindBy(Expression<Func<QueueTask, bool>> predicate);
         QueueTask FirstOrDefault(Expression<Func<QueueTask, bool>> predicate);
-        //Task<QueueTask> FirstOrDefaultAsync(Expression<Func<QueueTask, bool>> predicate);
+        //Task<QueueTasks> FirstOrDefaultAsync(Expression<Func<QueueTasks, bool>> predicate);
         QueueTask Get(QueueTask entity);
         IList<QueueTask> GetAll();
         QueueTask GetById(int id);

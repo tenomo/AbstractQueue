@@ -9,7 +9,7 @@ namespace AbstractQueue
     public  sealed class QueueTask 
   {
       /// <summary>
-      /// QueueTask id.
+      /// QueueTasks id.
       /// </summary>
 
     
@@ -25,19 +25,19 @@ namespace AbstractQueue
         public string QueueName { get;   set; }
 
         /// <summary>
-        /// QueueTask status.
+        /// QueueTasks status.
         /// </summary>
         public QueueTaskStatus QueueTaskStatus { get; internal set; }
 
         
 
         /// <summary>
-        /// QueueTask type for determinate the executer(custom value).
+        /// QueueTasks type for determinate the executer(custom value).
         /// </summary>
         public byte Type { get; set; }
 
         /// <summary>
-        /// QueueTask body as Json for execution.
+        /// QueueTasks body as Json for execution.
         /// </summary>
         public string Body { get; set; }
 
@@ -67,8 +67,8 @@ namespace AbstractQueue
             }
         }
 
-      [NotMapped]
-      internal TaskStore.TaskStore TaskStore { get; set; } 
+      //[NotMapped]
+      //internal TaskStore.TaskStore TaskStore { get; set; } 
       public static QueueTask Create(byte type, string body)
         {
             return new QueueTask()
