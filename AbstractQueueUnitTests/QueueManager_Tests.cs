@@ -31,10 +31,10 @@ namespace AbstractQueueUnitTests
 
         public void Test_Get_Queue()
         {
-            var context = new QueueDBContext();
-            var queue_one = QueueFactory.CreateQueue(2, new MessageExecuter(), context, QueueNameOne);
-            var queue_two = QueueFactory.CreateQueue(3, new MessageExecuter(), context, QueueNameTwo);
-            var queue_three = QueueFactory.CreateQueue(4, new MessageExecuter(), context, QueueNameThree);
+           // var context = new QueueDBContext();
+            var queue_one = QueueFactory.CreateQueue(2, new MessageExecuter(), QueueNameOne);
+            var queue_two = QueueFactory.CreateQueue(3, new MessageExecuter(),   QueueNameTwo);
+            var queue_three = QueueFactory.CreateQueue(4, new MessageExecuter(),   QueueNameThree);
 
 
             QueueManager.Kernel.RegistrateQueue(queue_one);
@@ -72,7 +72,7 @@ namespace AbstractQueueUnitTests
         [TestMethod]
         public void Test_Queue_QM_On_NumberCalculateExecuter_with_2_Workers()
         {
-            var context = new QueueDBContext();
+        
            
          
          
@@ -101,7 +101,7 @@ namespace AbstractQueueUnitTests
             Assert.AreEqual(0 , NumberCalculateExecuter.resultList.Count);
 
             const string queueName = "lala";
-            var queue = QueueFactory.CreateQueue(6, new NumberCalculateExecuter(), context, queueName);
+            var queue = QueueFactory.CreateQueue(6, new NumberCalculateExecuter(),  queueName);
             QueueManager.Kernel.RegistrateQueue(queue);
             Logger.LogMessage(QueueManager.Kernel[queueName].QueueName + "\n");
 

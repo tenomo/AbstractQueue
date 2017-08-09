@@ -1,21 +1,23 @@
 ﻿using System;
+using System.Collections;
 using System.ComponentModel.DataAnnotations;
 using System.ComponentModel.DataAnnotations.Schema;
 
 namespace AbstractQueue
 {
   [Serializable]
-    public  sealed class QueueTask :  IQueueName
-    {
-        /// <summary>
-        /// QueueTask id.
-        /// </summary>
-         
+    public  sealed class QueueTask 
+  {
+      /// <summary>
+      /// QueueTask id.
+      /// </summary>
+
+    
        [Key]
-        public int Id { get; set; }
+        public   int Id { get; set; }
 
          
-        public int TaskIdInQueue { get; set; }
+        public int TaskIndexInQueue { get; set; }
 
         /// <summary>
         ///  Queue name which the belongs task.
@@ -65,7 +67,9 @@ namespace AbstractQueue
             }
         }
 
-        public static QueueTask Create(byte type, string body)
+      [NotMapped]
+      internal TaskStore.TaskStore TaskStore { get; set; } 
+      public static QueueTask Create(byte type, string body)
         {
             return new QueueTask()
             {
