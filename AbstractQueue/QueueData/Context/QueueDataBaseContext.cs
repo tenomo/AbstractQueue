@@ -1,29 +1,29 @@
 ﻿using System.Data.Entity;
+using AbstractQueue.Core;
+using AbstractQueue.QueueData.Entities;
 
-namespace AbstractQueue.QueueData
+namespace AbstractQueue.QueueData.Context
 {
    internal class QueueDataBaseContext : DbContext
     {
         /// <summary>
         /// Queue task set.
         /// </summary>
-        public DbSet<QueueTask> QueueTasks { get; set; }
-        public static string ConnectionName { get; set; } = "DefaultConnection";
+        internal DbSet<QueueTask> QueueTasks { get; set; }
+        internal static string ConnectionName { get; set; } = "DefaultConnection";
 
         private readonly CreateDatabaseIfNotExists <QueueDataBaseContext> dbInitializerStrategy = new CreateDatabaseIfNotExists<QueueDataBaseContext>();
 
-        public QueueDataBaseContext():base(ConnectionName)
-        {
-            Database.SetInitializer(dbInitializerStrategy);
-
-        }
-         
-        public QueueDataBaseContext(string connectionName) : base(connectionName)
+        internal QueueDataBaseContext():base(ConnectionName)
         {
             Database.SetInitializer(dbInitializerStrategy);
 
         }
 
-         
+        internal QueueDataBaseContext(string connectionName) : base(connectionName)
+        {
+            Database.SetInitializer(dbInitializerStrategy);
+
+        } 
     }
 }

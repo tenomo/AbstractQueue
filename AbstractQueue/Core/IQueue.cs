@@ -1,6 +1,7 @@
 ﻿using System;
+using AbstractQueue.QueueData.Entities;
 
-namespace AbstractQueue
+namespace AbstractQueue.Core
 {
     public interface IQueue
     {

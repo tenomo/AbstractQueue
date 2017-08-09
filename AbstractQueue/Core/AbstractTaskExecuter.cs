@@ -1,6 +1,6 @@
-﻿using AbstractQueue.TaskStore;
+﻿using AbstractQueue.QueueData.Entities;
 
-namespace AbstractQueue
+namespace AbstractQueue.Core
 {
 
     public abstract class AbstractTaskExecuter

@@ -1,6 +1,4 @@
-﻿using AbstractQueue.QueueData;
-
-namespace AbstractQueue
+﻿namespace AbstractQueue.Core
 {
   public static class QueueFactory
     {

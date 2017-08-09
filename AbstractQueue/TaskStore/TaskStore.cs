@@ -1,12 +1,9 @@
 ﻿using System;
-using System.Collections;
 using System.Collections.Generic;
-using System.Data.Entity;
-using System.Data.Entity.Infrastructure;
 using System.Linq;
-using System.Threading;
-using System.Threading.Tasks;
-using AbstractQueue.QueueData;
+using AbstractQueue.Core;
+using AbstractQueue.QueueData.Context;
+using AbstractQueue.QueueData.Entities;
 
 namespace AbstractQueue.TaskStore
 {
@@ -15,18 +12,8 @@ namespace AbstractQueue.TaskStore
     /// </summary>
     internal sealed class TaskStore : ITaskStore
     {
-        private static int count;
-        private QueueDataBaseContext QDBContex  
-        {
-        get
-        {
-            count++;
-                System.Diagnostics.Debug.WriteLine(count);
-                if (count >30)
-                    throw new Exception("JOPA");
-                return new QueueDataBaseContext();
-            }
-        }
+       
+        private QueueDataBaseContext QDBContex => new QueueDataBaseContext();
 
         public event Action<QueueTask> ExecutedTaskEvent;
         public event Action<QueueTask> FailedExecuteTaskEvent;

@@ -1,9 +1,8 @@
 ﻿using System;
-using System.Collections;
 using System.ComponentModel.DataAnnotations;
-using System.ComponentModel.DataAnnotations.Schema;
+using AbstractQueue.Core;
 
-namespace AbstractQueue
+namespace AbstractQueue.QueueData.Entities
 {
   [Serializable]
     public  sealed class QueueTask 
