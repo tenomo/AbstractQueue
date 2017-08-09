@@ -149,10 +149,6 @@ namespace AbstractQueue
                 }
         }
 
-        
-
-    
-
         /// <summary>
         /// Check executeble queueTask and return boolean value and queueTask workerId.
         /// </summary>
@@ -161,7 +157,9 @@ namespace AbstractQueue
         private void IsCanExecuteTask(out bool isCan, out int index)
         {
              index = 0;
+/*
             isCan = false;
+*/
             var queueWorkers = QueueWorkers;
             var countExecuteTasks = queueWorkers.Count(CheckQueueTaskStatus);
             var queueWorkerCount = QueueWorkersCount;
@@ -197,7 +195,9 @@ namespace AbstractQueue
         {
             var queueWorkers = QueueWorkers;
             var queueWorkerCount = QueueWorkersCount;
+/*
             isCan = false;
+*/
             int countExecuteTasks = queueWorkers.Count(CheckQueueTaskStatus);
             var task = TaskStore.GetAll().FirstOrDefault(each => CheckQueueTaskStatus(each) && each.QueueName == QueueName);
 
@@ -239,5 +239,14 @@ namespace AbstractQueue
             task.Attempt++;
             TaskStore.Update(task);
         }
+
+
+        //TODO GetWorker method on base IsCanExecuteTask method
+
+        //TODO Worker on base this Queue class
+             //TODO One task and hes childrens in self thread
+
+
+
     }
 }
