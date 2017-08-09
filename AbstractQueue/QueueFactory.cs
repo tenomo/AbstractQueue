@@ -12,10 +12,9 @@ namespace AbstractQueue
         /// <param name="isHandleFailed"></param>
         /// <param name="countHandleFailed"></param>
         /// <returns></returns>
-        public static IQueue CreateQueueHandleFailed(int threadCount, AbstractTaskExecuter executer,
-            int countHandleFailed, IQueueDBContext queueDbContext, string queueName)
+        public static IQueue CreateQueueHandleFailed(int threadCount, AbstractTaskExecuter executer,int countHandleFailed ,string queueName)
         {
-            return new Queue(threadCount, executer, queueDbContext, queueName, countHandleFailed);
+            return new Queue(threadCount, executer,  queueName, countHandleFailed);
         }
 
         /// <summary>
@@ -24,9 +23,9 @@ namespace AbstractQueue
         /// <param name="threadCount"></param>
         /// <param name="executer"></param>
         /// <returns></returns>
-        public static IQueue CreateQueue(int threadCount, AbstractTaskExecuter executer, IQueueDBContext queueDbContext, string queueName)
+        public static IQueue CreateQueue(int threadCount, AbstractTaskExecuter executer, string queueName)
         {
-            return new Queue(threadCount, executer, queueDbContext, queueName);
+            return new Queue(threadCount, executer,  queueName);
         }
     }
 }

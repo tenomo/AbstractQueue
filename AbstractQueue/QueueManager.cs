@@ -52,8 +52,8 @@ namespace AbstractQueue
 
         public IQueue this[string QueueName] => queues[QueueName];
 
-     
 
+        public static Config Config { get; set; }
 
     }
 }

@@ -12,15 +12,15 @@ namespace AbstractQueueUnitTests
        
         public Queue_Tests()
         {
-        
+         
         }
 
        
         [TestMethod]
         public void ExecuteTasks_on_1_Worker_Test()
         {
-            var context = new QueueDBContext();
-            var queue =  QueueFactory.CreateQueue(1, new MessageExecuter(),context /*DBSingle.DbContext*/, "ExecuteTasks_on_1_Worker");
+          //  var context = new QueueDBContext();
+            var queue =  QueueFactory.CreateQueue(1, new MessageExecuter() , "ExecuteTasks_on_1_Worker");
             queue.AddTask(QueueTask.Create((int)MessageTypes.A, " "));
             queue.AddTask(QueueTask.Create((int)MessageTypes.B, " "));
             queue.AddTask(QueueTask.Create((int)MessageTypes.C, " "));
@@ -37,8 +37,8 @@ namespace AbstractQueueUnitTests
         [TestMethod]
         public void ExecuteTasks_on_4_Workers_Test()
         {
-            var context = new QueueDBContext();
-            var queue = QueueFactory.CreateQueue(4, new MessageExecuter(),context /*DBSingle.DbContext*/, "ExecuteTasks_on_4_Worker");
+           // var context = new QueueDBContext();
+            var queue = QueueFactory.CreateQueue(4, new MessageExecuter() , "ExecuteTasks_on_4_Worker");
           queue.AddTask(QueueTask.Create((int)MessageTypes.A, " "));
             queue.AddTask(QueueTask.Create((int)MessageTypes.B, " "));
             queue.AddTask(QueueTask.Create((int)MessageTypes.C, " "));
@@ -56,8 +56,8 @@ namespace AbstractQueueUnitTests
         [TestMethod]
         public void ExecuteTasks_on_4_Workers_handle_error_Test()
         {
-            var context = new QueueDBContext();
-            var queue = QueueFactory.CreateQueueHandleFailed(4,new MessageExecuter(), 4, context/*DBSingle.DbContext*/, "ExecuteTasks_on_2_Workers_handle_error_Test");
+           // var context = new QueueDBContext();
+            var queue = QueueFactory.CreateQueueHandleFailed(4,new MessageExecuter(), 4, "ExecuteTasks_on_2_Workers_handle_error_Test");
             queue.AddTask(QueueTask.Create((int)MessageTypes.A, "A"));
             queue.AddTask(QueueTask.Create((int)MessageTypes.B, "B"));
             queue.AddTask(QueueTask.Create((int)MessageTypes.C, "C"));
@@ -74,8 +74,8 @@ namespace AbstractQueueUnitTests
         [TestMethod]
         public void ExecuteTasks_on_2_Workers_handle_error_Test()
         {
-            var context = new QueueDBContext();
-            var queue = QueueFactory.CreateQueueHandleFailed(2, new MessageExecuter(), 4, context /*DBSingle.DbContext*/, "ExecuteTasks_on_2_Workers_handle_error_Test");
+          //  var context = new QueueDBContext();
+            var queue = QueueFactory.CreateQueueHandleFailed(2, new MessageExecuter(), 4, "ExecuteTasks_on_2_Workers_handle_error_Test");
             queue.AddTask(QueueTask.Create((int)MessageTypes.A, "A"));
             queue.AddTask(QueueTask.Create((int)MessageTypes.B, "B"));
             queue.AddTask(QueueTask.Create((int)MessageTypes.C, "C"));

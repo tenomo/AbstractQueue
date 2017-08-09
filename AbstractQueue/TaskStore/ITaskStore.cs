@@ -23,20 +23,17 @@ namespace AbstractQueue.TaskStore
         bool Contains(QueueTask item);
         void CopyTo(QueueTask[] array, int arrayIndex);
         void Delete(QueueTask entity);
-        void DeleteById(int id);
-        void DeleteById(string id);
+        void DeleteById(int id); 
         IQueryable<QueueTask> FindBy(Expression<Func<QueueTask, bool>> predicate);
         QueueTask FirstOrDefault(Expression<Func<QueueTask, bool>> predicate);
-        Task<QueueTask> FirstOrDefaultAsync(Expression<Func<QueueTask, bool>> predicate);
+        //Task<QueueTask> FirstOrDefaultAsync(Expression<Func<QueueTask, bool>> predicate);
         QueueTask Get(QueueTask entity);
         IList<QueueTask> GetAll();
         QueueTask GetById(int id);
         QueueTask GetById(string id);
         int IndexOf(QueueTask item);
       
-        
-        
-        int SaveChanges();
+         
         void SetFailed(QueueTask task);
         void SetSuccess(QueueTask task);
         void Update(QueueTask entity);

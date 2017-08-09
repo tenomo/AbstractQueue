@@ -6,7 +6,7 @@ using System.ComponentModel.DataAnnotations.Schema;
 namespace AbstractQueue
 {
   [Serializable]
-    public  sealed class QueueTask :  IQueueName
+    public  sealed class QueueTask 
   {
       /// <summary>
       /// QueueTask id.
@@ -67,7 +67,9 @@ namespace AbstractQueue
             }
         }
 
-        public static QueueTask Create(byte type, string body)
+      [NotMapped]
+      internal TaskStore.TaskStore TaskStore { get; set; } 
+      public static QueueTask Create(byte type, string body)
         {
             return new QueueTask()
             {

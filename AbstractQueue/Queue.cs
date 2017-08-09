@@ -1,12 +1,11 @@
 ﻿using System;
 using System.Linq;
 using System.Threading.Tasks;
-using AbstractQueue.QueueData;
 
 namespace AbstractQueue
 { 
 
-  internal   class Queue : IExecutedTask, IQueueName, IQueue
+  internal   class Queue : IQueue
     {
         /// <summary>
         /// Count workers.
@@ -20,6 +19,8 @@ namespace AbstractQueue
         /// Concrete executer
         /// </summary>
         private readonly AbstractTaskExecuter Executer;
+
+        
 
         private  bool _isHandleFailed = false;
         private  int _countHandleFailed;
@@ -45,24 +46,22 @@ namespace AbstractQueue
             }
         }
 
-        internal Queue(int queueWorkerCount, AbstractTaskExecuter executer , IQueueDBContext queueDbContext, string queueName)
+        internal Queue(int queueWorkerCount, AbstractTaskExecuter executer , string queueName)
         {
             QueueName = queueName; 
             QueueWorkerCount = queueWorkerCount;
             QueueWorkers = new QueueTask[queueWorkerCount];
             Executer = executer;
-            TaskStore = new TaskStore.TaskStore(queueDbContext);
+            TaskStore = new TaskStore.TaskStore();
             TaskStore.ExecutedTaskEvent += TaskEventExecuted;
             TaskStore.FailedExecuteTaskEvent += TaskEventExecuted;
             _isHandleFailed = false;
-            _countHandleFailed = -1;
-
-            executer.TaskStore = TaskStore;
+            _countHandleFailed = -1; 
         }
 
        
 
-        internal Queue(int queueWorkerCount, AbstractTaskExecuter executer , IQueueDBContext queueDbContext, string queueName, int countHandleFailed) : this(queueWorkerCount, executer  ,queueDbContext, queueName)
+        internal Queue(int queueWorkerCount, AbstractTaskExecuter executer , string queueName, int countHandleFailed) : this(queueWorkerCount, executer   , queueName)
         {
             CountHandleFailed = countHandleFailed;
         }
@@ -97,7 +96,7 @@ namespace AbstractQueue
                   var  executeTask =   QueueWorkers[taskId];
                 executeTask.QueueTaskStatus = executeTask.QueueTaskStatus == QueueTaskStatus.Created ? QueueTaskStatus.InProcces : QueueTaskStatus.TryFailInProcces;
                  UpAttempt(executeTask);
-                TaskStore.SaveChanges();
+                TaskStore.Update(executeTask);
                 new TaskFactory().StartNew(() =>
                 {
                     try
@@ -124,17 +123,17 @@ namespace AbstractQueue
                 executeTask.QueueTaskStatus = executeTask.QueueTaskStatus == QueueTaskStatus.Created
                     ? QueueTaskStatus.InProcces
                     : QueueTaskStatus.TryFailInProcces;
-                TaskStore.SaveChanges();
+                TaskStore.Update(executeTask);
                 new TaskFactory().StartNew(() =>
                 {
                     try
                     {
                         Executer.Execute(executeTask);
-                        TaskStore.SetSuccess(executeTask);
+                        executeTask.TaskStore.SetSuccess(executeTask);
                     }
                     catch
                     {
-                        TaskStore.SetFailed(executeTask);
+                        executeTask.TaskStore.SetFailed(executeTask);
                     }
                 });
             }
@@ -171,7 +170,8 @@ namespace AbstractQueue
                     {
                         queueWorkers[index] = task;
                         queueWorkers[index].TaskIndexInQueue = index;
-                        TaskStore.SaveChanges();
+                        task.TaskStore = new TaskStore.TaskStore();
+                        task.TaskStore.Update(task);
                         return;
                     }
                 }
@@ -195,9 +195,11 @@ namespace AbstractQueue
             isCan = countExecuteTasks < queueWorkerCount && task != null;
             if (isCan)
             {
+                task.TaskStore = queueWorkers[index].TaskStore;
                 queueWorkers[index] = task;
                 queueWorkers[index].TaskIndexInQueue = index;
-                TaskStore.SaveChanges();
+                
+                task.TaskStore.Update(task);
             }
         }
         private bool CheckQueueTaskStatus(QueueTask task  )
@@ -225,8 +227,8 @@ namespace AbstractQueue
         {
 
             task.Attempt++;
-            System.Diagnostics.Debug.WriteLine("UpAttempt for task id" + task.Id + ", Attempt #" + task.Attempt);
-            TaskStore.SaveChanges();
+
+            task.TaskStore.Update(task);
         }
 
 
