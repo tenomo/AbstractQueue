@@ -35,6 +35,7 @@ namespace AbstractQueue.Core
 
         private readonly TaskStore.TaskStore QueueTaskStore;
         private AbstractTaskExecuter _executer;
+        private string _queueName;
 
         public event Action<QueueTask> InProccesTaskEvent;
         public event Action<QueueTask> SuccessExecuteTaskEvent;
@@ -43,7 +44,16 @@ namespace AbstractQueue.Core
         /// <summary>
         /// Current queue name
         /// </summary>
-        public string QueueName { get; set; }
+        public string QueueName
+        {
+            get { return _queueName; }
+            set
+            {
+                if (string.IsNullOrEmpty(value))
+                    throw new ArgumentException("QueueName must be not null and not be empty");
+                _queueName = value;
+            }
+        }
 
         public int AttemptMaxCount
         {
@@ -81,14 +91,14 @@ namespace AbstractQueue.Core
             _executer = executer;
             attemptMaxCount = 0;
             QueueTaskStore = new TaskStore.TaskStore();
-            QueueWorkers = BuildWorkers(QueueWorkersCount, Executer, queueName);
+            QueueWorkers = BuildWorkers(QueueWorkersCount, Executer, QueueName);
         }
 
         internal Queue(int queueWorkersCount, AbstractTaskExecuter executer, string queueName, int attemptMaxCount)
             : this(queueWorkersCount, executer, queueName)
         {
             AttemptMaxCount = attemptMaxCount;
-            QueueWorkers = BuildWorkers(QueueWorkersCount, Executer, queueName, attemptMaxCount);
+            QueueWorkers = BuildWorkers(QueueWorkersCount, Executer, QueueName, attemptMaxCount);
         }
 
         private QueueWorker[] BuildWorkers(int queueWorkersCount, AbstractTaskExecuter executer, string queueName,
@@ -120,6 +130,7 @@ namespace AbstractQueue.Core
         {
             queueTask.QueueName = QueueName;
             QueueTaskStore.Add(queueTask);
+            TryExecuteTask();
             return QueueTaskStore.IndexOf(queueTask);
         }
 
@@ -138,17 +149,21 @@ namespace AbstractQueue.Core
 
 
 
-        protected virtual void OnInProccesTaskEvent(QueueTask obj)
+        private void OnInProccesTaskEvent(QueueTask obj)
         {
             InProccesTaskEvent?.Invoke(obj);
         }
 
-        protected virtual void OnSuccessExecuteTaskEvent(QueueTask obj)
+        private void OnSuccessExecuteTaskEvent(QueueTask obj)
         {
             SuccessExecuteTaskEvent?.Invoke(obj);
         }
 
-        protected virtual void OnFailedExecuteTaskEvent(QueueTask obj)
+        /// <summary>
+        /// 
+        /// </summary>
+        /// <param name="obj"></param>
+        private void OnFailedExecuteTaskEvent(QueueTask obj)
         {
             FailedExecuteTaskEvent?.Invoke(obj);
         }

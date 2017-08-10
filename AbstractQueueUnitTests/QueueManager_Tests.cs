@@ -123,6 +123,8 @@ namespace AbstractQueueUnitTests
                 var jsonBody = Newtonsoft.Json.JsonConvert.SerializeObject(body);
                 QueueManager.Kernel[queueName].AddTask(QueueTask.Create((byte) calculationTypeArray[i], jsonBody));
 
+                Assert.AreEqual(resultList.Length, NumberCalculateExecuter.resultList.Count);
+
             }
 
 

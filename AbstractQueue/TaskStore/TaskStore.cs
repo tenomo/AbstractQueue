@@ -12,8 +12,18 @@ namespace AbstractQueue.TaskStore
     /// </summary>
     internal sealed class TaskStore : ITaskStore, ITaskExecutionObserve
     {
+        private  QueueDataBaseContext _qdbContex;
 
-        private QueueDataBaseContext QdbContex { get; set; }
+        private QueueDataBaseContext QdbContex
+        {
+            get
+            {
+                if (_qdbContex == null)
+                    _qdbContex = new QueueDataBaseContext(Config.ConnectionStringName);
+                return _qdbContex;
+            }
+            set { _qdbContex = value; }
+        }
 
         public event Action<QueueTask> SuccessExecuteTaskEvent;
         public event Action<QueueTask> FailedExecuteTaskEvent;
@@ -21,7 +31,8 @@ namespace AbstractQueue.TaskStore
         private IQueryable<QueueTask> QueueTasks => QdbContex.QueueTasks;
 
         public void Add(QueueTask item)
-        { 
+        {
+             var context = new  QueueDataBaseContext(Config.ConnectionStringName);
             QdbContex.QueueTasks.Add(item);
             QdbContex.SaveChanges();
         }
@@ -46,7 +57,7 @@ namespace AbstractQueue.TaskStore
 
         internal TaskStore()
         {
-            QdbContex = new QueueDataBaseContext(Config.ConnectionStringName);
+            _qdbContex = new QueueDataBaseContext(Config.ConnectionStringName);
             SuccessExecuteTaskEvent += TaskStore_SetStatus;
             FailedExecuteTaskEvent += TaskStore_SetStatus;
             InProccesTaskEvent += TaskStore_SetStatus;
@@ -140,7 +151,8 @@ namespace AbstractQueue.TaskStore
         }
 
         public QueueTask FirstOrDefault(System.Linq.Expressions.Expression<Func<QueueTask, bool>> predicate)
-        {
+        { 
+
             return QdbContex.QueueTasks.FirstOrDefault(predicate);
         }
 
