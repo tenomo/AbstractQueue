@@ -33,8 +33,9 @@ namespace AbstractQueue.TaskStore
         public void Add(QueueTask item)
         {
              var context = new  QueueDataBaseContext(Config.ConnectionStringName);
-            QdbContex.QueueTasks.Add(item);
-            QdbContex.SaveChanges();
+            context.QueueTasks.Add(item);
+            context.SaveChanges();
+            context.Database.Connection.Close();
         }
 
         public void Clear()

@@ -2,10 +2,11 @@
 using System.Collections.Generic;
 using System.Data.Entity;
 using System.Linq;
+using System.Threading;
+using System.Threading.Tasks;
 using AbstractQueue;
 using AbstractQueue.Core;
-using AbstractQueue.QueueData.Entities;
-using AbstractQueueUnitTests.Mocks;
+using AbstractQueue.QueueData.Entities; 
 using Microsoft.VisualStudio.TestTools.UnitTesting;
 using Microsoft.VisualStudio.TestTools.UnitTesting.Logging;
 
@@ -34,9 +35,9 @@ namespace AbstractQueueUnitTests
         public void Test_Get_Queue()
         {
            // var context = new QueueDBContext();
-            var queue_one = QueueFactory.CreateQueue(2, new MessageExecuter(), QueueNameOne);
-            var queue_two = QueueFactory.CreateQueue(3, new MessageExecuter(),   QueueNameTwo);
-            var queue_three = QueueFactory.CreateQueue(4, new MessageExecuter(),   QueueNameThree);
+            var queue_one = QueueFactory.CreateQueue(2, new MockTaskExecuter(), QueueNameOne);
+            var queue_two = QueueFactory.CreateQueue(3, new MockTaskExecuter(),   QueueNameTwo);
+            var queue_three = QueueFactory.CreateQueue(4, new MockTaskExecuter(),   QueueNameThree);
 
 
             QueueManager.Kernel.RegistrateQueue(queue_one);
@@ -73,62 +74,55 @@ namespace AbstractQueueUnitTests
         /// </summary>
         [TestMethod]
         public void Test_Queue_QM_On_NumberCalculateExecuter_with_2_Workers()
-        {
-        
-           
-         
-         
-            var calculationTypeArray  = Enum.GetValues(typeof(CaluculationType)).Cast<CaluculationType>().ToArray();
-            object body;
-            ExecutionResult[] resultList = new ExecutionResult[calculationTypeArray.Length];
-            // build ideal
-            for (int i = 0; i < calculationTypeArray.Length; i++)
+        { 
+            int itterationCount = 10;
+            int executedTasksCount = 1;
+            const string queueName = "Test_Queue_QM_On_NumberCalculateExecuter_with_2_Workers";
+            var queue = QueueFactory.CreateQueue(2, new MockTaskExecuter(), queueName);
+            queue.SuccessExecuteTaskEvent += delegate(QueueTask task)
             {
-                int val = i + 1;
-                if (calculationTypeArray[i] != CaluculationType.Sqrt ||
-                    calculationTypeArray[i] != CaluculationType.Factorial)
-                {
-                    body = new NumberWraper2D  { X = val * 3,Y= val * 2};
-                }
-                else
-                {
-                    body = new NumberWraper1D { X = val * 3 };
-                }
-                var jsonBody = Newtonsoft.Json.JsonConvert.SerializeObject(body);
-                NumberCalculateExecuter.Calculator(QueueTask.Create((byte) calculationTypeArray[i], jsonBody));
-                Logger.LogMessage("Ideal. Type: " + NumberCalculateExecuter.resultList[i].Type + " Result:" +NumberCalculateExecuter.resultList[i].Result);
-            }
-            NumberCalculateExecuter.resultList.CopyTo(resultList);
-            NumberCalculateExecuter.resultList= new List<ExecutionResult>();
-            Assert.AreEqual(0 , NumberCalculateExecuter.resultList.Count);
-
-            const string queueName = "lala";
-            var queue = QueueFactory.CreateQueue(6, new NumberCalculateExecuter(),  queueName);
+                executedTasksCount++;
+            };
             QueueManager.Kernel.RegistrateQueue(queue);
-            Logger.LogMessage(QueueManager.Kernel[queueName].QueueName + "\n");
 
-
-            for (int i = 0; i < calculationTypeArray.Length; i++)
+            for (int i = 0; i < itterationCount; i++)
             {
-                int val = i + 1;
-                if (calculationTypeArray[i] != CaluculationType.Sqrt ||
-                    calculationTypeArray[i] != CaluculationType.Factorial)
-                {
-                    body = new NumberWraper2D  { X = val * 3,Y= val * 2};
-                }
-                else
-                {
-                    body = new NumberWraper1D { X = val * 3 };
-                } 
-                var jsonBody = Newtonsoft.Json.JsonConvert.SerializeObject(body);
-                QueueManager.Kernel[queueName].AddTask(QueueTask.Create((byte) calculationTypeArray[i], jsonBody));
-
-                Assert.AreEqual(resultList.Length, NumberCalculateExecuter.resultList.Count);
-
+                QueueManager.Kernel[queueName].AddTask(QueueTask.Create(0,i.ToString()));
             }
-
-
+            Assert.AreEqual(itterationCount, executedTasksCount);
         }
+
+
+        [TestMethod]
+        public void Test_Queue_QM__with_2_Workers_multy_thread_calls()
+        {
+            int itterationCount = 10;
+            int executedTasksCount = 1;
+            const string queueName = "Test_Queue_QM_On_NumberCalculateExecuter_with_2_Workers";
+            var queue = QueueFactory.CreateQueue(2, new MockTaskExecuter(), queueName);
+            queue.SuccessExecuteTaskEvent += delegate (QueueTask task)
+            {
+                executedTasksCount++;
+            };
+            QueueManager.Kernel.RegistrateQueue(queue);
+
+            for (int i = 0; i < itterationCount; i++)
+            {
+                new TaskFactory().StartNew(() => { QueueManager.Kernel[queueName].AddTask(QueueTask.Create(0, i.ToString())); });
+      
+            }
+            Assert.AreEqual(itterationCount, executedTasksCount);
+        }
+
+        class MockTaskExecuter :AbstractTaskExecuter
+        {
+            public override void Execute(QueueTask queueTask)
+            {
+                 
+            }
+        }
+
     }
-}
+    }
+ 
  
