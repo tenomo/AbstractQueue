@@ -6,7 +6,7 @@ using AbstractQueue.QueueData.Entities;
 
 namespace AbstractQueue.Core
 {
-   internal class QueueWorker : TaskExecutionObaerve
+   internal class QueueWorker : ITaskExecutionObserve
     {
         /// <summary>
         /// Queue worker id.

@@ -5,7 +5,7 @@ using AbstractQueue.Core;
 namespace AbstractQueue.QueueData.Entities
 {
   [Serializable]
-    public  sealed class QueueTask 
+    public  sealed class QueueTask  
   {
       /// <summary>
       /// QueueTasks id.

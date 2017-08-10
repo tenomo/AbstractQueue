@@ -1,30 +1,40 @@
 ﻿using System;
 using System.Linq;
-using System.Threading.Tasks;
 using AbstractQueue.QueueData.Entities;
 
 namespace AbstractQueue.Core
-{ 
+{
 
-  internal   class Queue : IQueue
+    internal class Queue : IQueue
     {
         /// <summary>
         /// Count workers.
         /// </summary>
-        private  int queueWorkersCount;
+        private int queueWorkersCount;
 
         /// <summary>
         /// Executeble queueTask array.
         /// </summary>
         private readonly QueueWorker[] QueueWorkers;
+
         /// <summary>
         /// Concrete executer
         /// </summary>
-        private readonly AbstractTaskExecuter Executer;
- 
-        private  int attemptMaxCount;
+        private AbstractTaskExecuter Executer
+        {
+            get { return _executer; }
+            set
+            {
+                if (_executer == null)
+                    throw new NullReferenceException("Executer must be not null");
+                _executer = value;
+            }
+        }
+
+        private int attemptMaxCount;
 
         private readonly TaskStore.TaskStore QueueTaskStore;
+        private AbstractTaskExecuter _executer;
 
         public event Action<QueueTask> InProccesTaskEvent;
         public event Action<QueueTask> SuccessExecuteTaskEvent;
@@ -39,8 +49,8 @@ namespace AbstractQueue.Core
         {
             get { return AttemptMaxCount; }
             private set
-            { 
-                  if (value<0)
+            {
+                if (value < 0)
                 {
                     throw new ArgumentException("AttemptMaxCount must be more 0");
                 }
@@ -64,30 +74,31 @@ namespace AbstractQueue.Core
         }
 
 
-        internal Queue(int queueWorkersCount, AbstractTaskExecuter executer , string queueName)
+        internal Queue(int queueWorkersCount, AbstractTaskExecuter executer, string queueName)
         {
-            QueueName = queueName; 
+            QueueName = queueName;
             this.QueueWorkersCount = queueWorkersCount;
-            Executer = executer;
+            _executer = executer;
             attemptMaxCount = 0;
             QueueTaskStore = new TaskStore.TaskStore();
-            QueueWorkers = BuildWorkers(QueueWorkersCount, executer,queueName);
+            QueueWorkers = BuildWorkers(QueueWorkersCount, Executer, queueName);
         }
 
         internal Queue(int queueWorkersCount, AbstractTaskExecuter executer, string queueName, int attemptMaxCount)
-           : this(queueWorkersCount, executer, queueName)
+            : this(queueWorkersCount, executer, queueName)
         {
             AttemptMaxCount = attemptMaxCount;
-            QueueWorkers = BuildWorkers(QueueWorkersCount, executer, queueName, attemptMaxCount);
+            QueueWorkers = BuildWorkers(QueueWorkersCount, Executer, queueName, attemptMaxCount);
         }
 
-        private   QueueWorker[] BuildWorkers(int queueWorkersCount, AbstractTaskExecuter executer, string queueName, int attemptMaxCount = 0)
+        private QueueWorker[] BuildWorkers(int queueWorkersCount, AbstractTaskExecuter executer, string queueName,
+            int attemptMaxCount = 0)
         {
             var workers = new QueueWorker[queueWorkersCount];
 
             for (int i = queueWorkersCount - 1; i >= 0; i--)
             {
-                workers[i] = new QueueWorker(executer,queueName, attemptMaxCount);
+                workers[i] = new QueueWorker(executer, queueName, attemptMaxCount);
                 var buff = workers[i];
 
                 buff.SuccessExecuteTaskEvent += OnSuccessExecuteTaskEvent;
@@ -98,7 +109,7 @@ namespace AbstractQueue.Core
         }
 
 
-       
+
 
         /// <summary>
         /// Add new task to queue
@@ -125,7 +136,7 @@ namespace AbstractQueue.Core
             return worker;
         }
 
-       
+
 
         protected virtual void OnInProccesTaskEvent(QueueTask obj)
         {

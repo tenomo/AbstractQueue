@@ -2,6 +2,7 @@
 using System.Collections.Generic;
 using System.Linq;
 using System.Linq.Expressions;
+using AbstractQueue.Core;
 using AbstractQueue.QueueData.Entities;
 
 namespace AbstractQueue.TaskStore
@@ -9,7 +10,7 @@ namespace AbstractQueue.TaskStore
     /// <summary>
     /// Task the provide thread-safe interface for work with queue database contex
     /// </summary>
-    public interface ITaskStore
+    public interface ITaskStore : ITaskExecutionObserve
     {
         QueueTask this[int index] { get; set; }
 
