@@ -61,6 +61,7 @@
     <Compile Include="QueueManager_Tests.cs" />
     <Compile Include="Queue_Tests.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
+    <Compile Include="TaskObserverTests.cs" />
   </ItemGroup>
   <ItemGroup>
     <None Include="App.config">
@@ -70,7 +71,7 @@
   </ItemGroup>
   <ItemGroup>
     <ProjectReference Include="..\AbstractQueue\AbstractQueue.csproj">
-      <Project>{0E0E63FA-25EC-4C15-ACB4-7BDED6A40E2C}</Project>
+      <Project>{0e0e63fa-25ec-4c15-acb4-7bded6a40e2c}</Project>
       <Name>AbstractQueue</Name>
     </ProjectReference>
   </ItemGroup>
