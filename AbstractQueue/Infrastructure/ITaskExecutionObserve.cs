@@ -1,6 +1,6 @@
 ﻿using System;
 using AbstractQueue.QueueData.Entities;
-namespace AbstractQueue.Core
+namespace AbstractQueue.Infrastructure
 {
     public interface ITaskExecutionObserve
     {

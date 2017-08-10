@@ -58,9 +58,6 @@
     <Reference Include="System.Core" />
   </ItemGroup>
   <ItemGroup>
-    <Compile Include="Mocks\QueueDBContext.cs" />
-    <Compile Include="Mocks\NumberCalculateExecuter.cs" />
-    <Compile Include="Mocks\MessageExecuter.cs" />
     <Compile Include="QueueManager_Tests.cs" />
     <Compile Include="Queue_Tests.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />

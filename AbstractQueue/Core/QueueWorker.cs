@@ -2,6 +2,7 @@
 using System.Linq;
 using System.Security.Policy;
 using System.Threading.Tasks;
+using AbstractQueue.Infrastructure;
 using AbstractQueue.QueueData.Entities;
 
 namespace AbstractQueue.Core
@@ -46,7 +47,7 @@ namespace AbstractQueue.Core
         /// <summary>
         /// Current queue name
         /// </summary>
-        internal readonly string queueName;
+        private readonly string queueName;
 
      
 
@@ -117,6 +118,7 @@ namespace AbstractQueue.Core
             var isCan =     IsCanExecuteTask( );
             if (!isCan)
             {
+                Logger.Log("wtf");  
                 SetStatusFree();
                 return;
             }
@@ -131,7 +133,7 @@ namespace AbstractQueue.Core
                 this.WorkerTaskStore = BuildTaskStore(); // Rebuild task store for new thread. 
                 try
                 {
-                    
+                    Logger.Log("Start task");  
                     Executer.Execute(currentTask);
                     WorkerTaskStore.SetSuccessStatus(currentTask);
                 }
@@ -161,17 +163,18 @@ namespace AbstractQueue.Core
             var isCan = IsCanExecuteTask();
             if (!isCan)
             {
+                Logger.Log("wtf"); Executer.Execute(currentTask);
                 SetStatusFree();
                 return;
             }
 
+            
           SetStatusBusy();
             UpAttempt(currentTask);
             WorkerTaskStore.SetProccesStatus(currentTask);
             try
-            { 
-                
-                Executer.Execute(currentTask);
+            {
+                Logger.Log("Start task"); Executer.Execute(currentTask);
                 WorkerTaskStore.SetSuccessStatus(currentTask);
             }
             catch
@@ -186,32 +189,42 @@ namespace AbstractQueue.Core
         /// </summary>
         /// <param name="isCan"></param>
         /// <param name="index"></param>
-        private bool IsCanExecuteTask( )
+        private bool IsCanExecuteTask()
         {
-             
-            var task = WorkerTaskStore.FirstOrDefault(each => CheckStatus(each) && each.QueueName == queueName);
-    
+          
+            var task = WorkerTaskStore.GetAll().FirstOrDefault(each => CheckStatus(each)  && each.QueueName == queueName );
+  Logger.Log(queueName);
+            Logger.Log((task == null).ToString());
 
-           var isCan = task != null;
+            var isCan = task != null;
 
-            if (!isCan)
+            if (isCan)
             {
-                currentTask = task;
 
-                if (currentTask != null && !CheckStatus(currentTask) &&
-                    !CheckOnAttemptLimit(currentTask))
+
+                if (CheckStatus(task) &&
+                    CheckOnAttemptLimit(task))
                 {
-                    currentTask = null;
-                    return false;
-                } 
-                 
+                    currentTask = task;
                     currentTask.TaskIndexInQueue = this.Id;
                     WorkerTaskStore.Update(currentTask);
+
+                    return isCan;
+                }
+
+                else
+                {
+                    currentTask = null;
+                    SetStatusFree();
+                    return false;
+                }
             }
-            return isCan;
+            currentTask = null;
+            SetStatusFree();
+            return false; 
         }
 
-       
+
 
         /// <summary>
         /// Check task status.
@@ -220,12 +233,12 @@ namespace AbstractQueue.Core
         /// <returns></returns>
         private bool CheckStatus(QueueTask task)
         {
+            
             var _isHandleFailed = this.isTryHandleError;
             if (_isHandleFailed)
             {
 
-                return task != null &&
-                       (task?.QueueTaskStatus == QueueTaskStatus.Created || task.QueueTaskStatus == QueueTaskStatus.Failed);
+                return  (task?.QueueTaskStatus == QueueTaskStatus.Created || task?.QueueTaskStatus == QueueTaskStatus.Failed);
             }
             else
                 return task?.QueueTaskStatus == QueueTaskStatus.Created;

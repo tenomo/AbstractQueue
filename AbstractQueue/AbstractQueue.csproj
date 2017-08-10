@@ -54,7 +54,9 @@
     <Compile Include="Config.cs" />
     <Compile Include="Core\IQueue.cs" />
     <Compile Include="Core\QueueWorker.cs" />
-    <Compile Include="Core\ITaskExecutionObserve.cs" />
+    <Compile Include="Infrastructure\ITaskExecutionObserve.cs" />
+    <Compile Include="Infrastructure\TaskExecutionObserver.cs" />
+    <Compile Include="Infrastructure\Singleton.cs" />
     <Compile Include="QueueData\Context\QueueDataBaseContext.cs" />
     <Compile Include="Core\QueueManager.cs" />
     <Compile Include="Logger.cs" />
@@ -69,5 +71,6 @@
   <ItemGroup>
     <None Include="packages.config" />
   </ItemGroup>
+  <ItemGroup />
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
 </Project>

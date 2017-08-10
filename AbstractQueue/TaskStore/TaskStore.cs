@@ -2,6 +2,7 @@
 using System.Collections.Generic;
 using System.Linq;
 using AbstractQueue.Core;
+using AbstractQueue.Infrastructure;
 using AbstractQueue.QueueData.Context;
 using AbstractQueue.QueueData.Entities;
 
@@ -12,8 +13,18 @@ namespace AbstractQueue.TaskStore
     /// </summary>
     internal sealed class TaskStore : ITaskStore, ITaskExecutionObserve
     {
+        private  QueueDataBaseContext _qdbContex;
 
-        private QueueDataBaseContext QdbContex { get; set; }
+        private QueueDataBaseContext QdbContex
+        {
+            get
+            {
+                if (_qdbContex == null)
+                    _qdbContex = new QueueDataBaseContext(Config.ConnectionStringName);
+                return _qdbContex;
+            }
+            set { _qdbContex = value; }
+        }
 
         public event Action<QueueTask> SuccessExecuteTaskEvent;
         public event Action<QueueTask> FailedExecuteTaskEvent;
@@ -21,9 +32,11 @@ namespace AbstractQueue.TaskStore
         private IQueryable<QueueTask> QueueTasks => QdbContex.QueueTasks;
 
         public void Add(QueueTask item)
-        { 
-            QdbContex.QueueTasks.Add(item);
-            QdbContex.SaveChanges();
+        {
+             var context = new  QueueDataBaseContext(Config.ConnectionStringName);
+            context.QueueTasks.Add(item);
+            context.SaveChanges();
+            context.Database.Connection.Close();
         }
 
         public void Clear()
@@ -46,7 +59,7 @@ namespace AbstractQueue.TaskStore
 
         internal TaskStore()
         {
-            QdbContex = new QueueDataBaseContext(Config.ConnectionStringName);
+            _qdbContex = new QueueDataBaseContext(Config.ConnectionStringName);
             SuccessExecuteTaskEvent += TaskStore_SetStatus;
             FailedExecuteTaskEvent += TaskStore_SetStatus;
             InProccesTaskEvent += TaskStore_SetStatus;
@@ -140,7 +153,8 @@ namespace AbstractQueue.TaskStore
         }
 
         public QueueTask FirstOrDefault(System.Linq.Expressions.Expression<Func<QueueTask, bool>> predicate)
-        {
+        { 
+
             return QdbContex.QueueTasks.FirstOrDefault(predicate);
         }
 
