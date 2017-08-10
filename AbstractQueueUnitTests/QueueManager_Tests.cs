@@ -1,14 +1,7 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Data.Entity;
-using System.Linq;
-using System.Threading;
-using System.Threading.Tasks;
-using AbstractQueue;
+﻿using System.Threading.Tasks;
 using AbstractQueue.Core;
 using AbstractQueue.QueueData.Entities; 
 using Microsoft.VisualStudio.TestTools.UnitTesting;
-using Microsoft.VisualStudio.TestTools.UnitTesting.Logging;
 
 namespace AbstractQueueUnitTests
 {
@@ -40,14 +33,14 @@ namespace AbstractQueueUnitTests
             var queue_three = QueueFactory.CreateQueue(4, new MockTaskExecuter(),   QueueNameThree);
 
 
-            QueueManager.Kernel.RegistrateQueue(queue_one);
-            QueueManager.Kernel.RegistrateQueue(queue_two);
-            QueueManager.Kernel.RegistrateQueue(queue_three);
+            QueueManager.Kernal.RegistrateQueue(queue_one);
+            QueueManager.Kernal.RegistrateQueue(queue_two);
+            QueueManager.Kernal.RegistrateQueue(queue_three);
 
 
-            Assert.AreEqual(queue_one, QueueManager.Kernel[QueueNameOne]);
-            Assert.AreEqual(queue_two, QueueManager.Kernel[QueueNameTwo]);
-            Assert.AreEqual(queue_three, QueueManager.Kernel[QueueNameThree]);
+            Assert.AreEqual(queue_one, QueueManager.Kernal[QueueNameOne]);
+            Assert.AreEqual(queue_two, QueueManager.Kernal[QueueNameTwo]);
+            Assert.AreEqual(queue_three, QueueManager.Kernal[QueueNameThree]);
 
         }
 
@@ -55,17 +48,17 @@ namespace AbstractQueueUnitTests
 
         public void Test_Delete_Queue()
         {
-            int queue_s_Count = QueueManager.Kernel.QueuesCount;
+            int queue_s_Count = QueueManager.Kernal.QueuesCount;
             System.Diagnostics.Debug.WriteLine(queue_s_Count);
             foreach (var VARIABLE in queue_names)
             {
-                QueueManager.Kernel.DeleteQueue(VARIABLE);
+                QueueManager.Kernal.DeleteQueue(VARIABLE);
             }
 
 
             int ideal = queue_s_Count - 3;
             System.Diagnostics.Debug.WriteLine(ideal);
-            Assert.AreEqual(QueueManager.Kernel.QueuesCount, ideal);
+            Assert.AreEqual(QueueManager.Kernal.QueuesCount, ideal);
 
         }
 
@@ -83,11 +76,11 @@ namespace AbstractQueueUnitTests
             {
                 executedTasksCount++;
             };
-            QueueManager.Kernel.RegistrateQueue(queue);
+            QueueManager.Kernal.RegistrateQueue(queue);
 
             for (int i = 0; i < itterationCount; i++)
             {
-                QueueManager.Kernel[queueName].AddTask(QueueTask.Create(0,i.ToString()));
+                QueueManager.Kernal[queueName].AddTask(QueueTask.Create(0,i.ToString()));
             }
             Assert.AreEqual(itterationCount, executedTasksCount);
         }
@@ -104,11 +97,11 @@ namespace AbstractQueueUnitTests
             {
                 executedTasksCount++;
             };
-            QueueManager.Kernel.RegistrateQueue(queue);
+            QueueManager.Kernal.RegistrateQueue(queue);
 
             for (int i = 0; i < itterationCount; i++)
             {
-                new TaskFactory().StartNew(() => { QueueManager.Kernel[queueName].AddTask(QueueTask.Create(0, i.ToString())); });
+                new TaskFactory().StartNew(() => { QueueManager.Kernal[queueName].AddTask(QueueTask.Create(0, i.ToString())); });
       
             }
             Assert.AreEqual(itterationCount, executedTasksCount);

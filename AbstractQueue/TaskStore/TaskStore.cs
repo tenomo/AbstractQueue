@@ -2,6 +2,7 @@
 using System.Collections.Generic;
 using System.Linq;
 using AbstractQueue.Core;
+using AbstractQueue.Infrastructure;
 using AbstractQueue.QueueData.Context;
 using AbstractQueue.QueueData.Entities;
 

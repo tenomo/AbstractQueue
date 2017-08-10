@@ -2,6 +2,7 @@
 using System.Linq;
 using System.Security.Policy;
 using System.Threading.Tasks;
+using AbstractQueue.Infrastructure;
 using AbstractQueue.QueueData.Entities;
 
 namespace AbstractQueue.Core

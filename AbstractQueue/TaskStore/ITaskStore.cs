@@ -2,7 +2,7 @@
 using System.Collections.Generic;
 using System.Linq;
 using System.Linq.Expressions;
-using AbstractQueue.Core;
+using AbstractQueue.Infrastructure;
 using AbstractQueue.QueueData.Entities;
 
 namespace AbstractQueue.TaskStore
