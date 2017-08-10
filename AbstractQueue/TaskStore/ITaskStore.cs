@@ -10,15 +10,16 @@ namespace AbstractQueue.TaskStore
     /// <summary>
     /// Task the provide thread-safe interface for work with queue database contex
     /// </summary>
-    public interface ITaskStore : ITaskExecutionObserve
+    public interface ITaskStore  
     {
         QueueTask this[int index] { get; set; }
-
+        string QueueName { get;   }
+        string Id { get; }
         int Count { get; }
         bool IsReadOnly { get; }
-        event Action<QueueTask> SuccessExecuteTaskEvent;
-        event Action<QueueTask> FailedExecuteTaskEvent;
-        event Action<QueueTask> InProccesTaskEvent;
+        //event Action<QueueTask> SuccessExecuteTaskEvent;
+        //event Action<QueueTask> FailedExecuteTaskEvent;
+        //event Action<QueueTask> InProccesTaskEvent;
         void Add(QueueTask item);
         void Clear();
         bool Contains(QueueTask item);

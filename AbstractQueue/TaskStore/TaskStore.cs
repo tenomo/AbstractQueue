@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Linq;
+using System.Runtime.InteropServices;
 using AbstractQueue.Core;
 using AbstractQueue.Infrastructure;
 using AbstractQueue.QueueData.Context;
@@ -11,9 +12,19 @@ namespace AbstractQueue.TaskStore
     /// <summary>
     /// Task the provide thread-safe interface for work with queue database contex
     /// </summary>
-    internal sealed class TaskStore : ITaskStore, ITaskExecutionObserve
+    internal sealed class TaskStore : ITaskStore//, ITaskExecutionObserver
     {
         private  QueueDataBaseContext _qdbContex;
+        private   string _id;
+        private string queueName;
+        public string QueueName {
+            get { return queueName; }
+            private set { queueName = value; } }
+      public  string  Id
+        {
+            get { return _id;  }
+          private set { _id = value; }
+      }
 
         private QueueDataBaseContext QdbContex
         {
@@ -26,9 +37,9 @@ namespace AbstractQueue.TaskStore
             set { _qdbContex = value; }
         }
 
-        public event Action<QueueTask> SuccessExecuteTaskEvent;
-        public event Action<QueueTask> FailedExecuteTaskEvent;
-        public event Action<QueueTask> InProccesTaskEvent;
+        //public event Action<QueueTask> SuccessExecuteTaskEvent;
+        //public event Action<QueueTask> FailedExecuteTaskEvent;
+        //public event Action<QueueTask> InProccesTaskEvent;
         private IQueryable<QueueTask> QueueTasks => QdbContex.QueueTasks;
 
         public void Add(QueueTask item)
@@ -57,18 +68,32 @@ namespace AbstractQueue.TaskStore
             set { QueueTasks.ToList()[index] = value; }
         }
 
-        internal TaskStore()
+        internal TaskStore(string queueName)
         {
             _qdbContex = new QueueDataBaseContext(Config.ConnectionStringName);
-            SuccessExecuteTaskEvent += TaskStore_SetStatus;
-            FailedExecuteTaskEvent += TaskStore_SetStatus;
-            InProccesTaskEvent += TaskStore_SetStatus;
-         
+            this.QueueName = queueName;
+            Id = Guid.NewGuid().ToString().Substring(0, 10);
+            //SuccessExecuteTaskEvent += TaskStore_SetStatus;
+            //FailedExecuteTaskEvent += TaskStore_SetStatus;
+            //InProccesTaskEvent += TaskStore_SetStatus;
+          
+            Infrastructure.TaskExecutionObserver.Kernal.FailedExecuteTaskEvent += TaskStore_SetStatus;
+            Infrastructure.TaskExecutionObserver.Kernal.SuccessExecuteTaskEvent += TaskStore_SetStatus;
+            Infrastructure.TaskExecutionObserver.Kernal.InProccesTaskEvent += TaskStore_SetStatus;
+            
         }
 
-        private void TaskStore_SetStatus(QueueTask obj)
+        internal TaskStore( )
         {
-            Update(obj);
+            _qdbContex = new QueueDataBaseContext(Config.ConnectionStringName);
+             
+            Id = Guid.NewGuid().ToString().Substring(0, 10);
+        }
+
+        private void TaskStore_SetStatus( ITaskStore obj,QueueTask e)
+        {
+            if (obj.Id == this.Id) 
+            Update(e);
         }
 
         public void SetFailedStatus(QueueTask task)
@@ -76,8 +101,8 @@ namespace AbstractQueue.TaskStore
             task.QueueTaskStatus = QueueTaskStatus.Failed;
             task.ExecutedDate = DateTime.Now;
             Update(task);
-            FailedExecuteTaskEvent?.Invoke(task);
-
+            //FailedExecuteTaskEvent?.Invoke(task);
+            Infrastructure.TaskExecutionObserver.Kernal.OnFailedExecuteTaskEvent(this,task);
         }
 
         public void SetSuccessStatus(QueueTask task)
@@ -85,14 +110,16 @@ namespace AbstractQueue.TaskStore
             task.QueueTaskStatus = QueueTaskStatus.Success;
             task.ExecutedDate = DateTime.Now;
             Update(task);
-            SuccessExecuteTaskEvent?.Invoke(task);
+            // SuccessExecuteTaskEvent?.Invoke(task);
+            Infrastructure.TaskExecutionObserver.Kernal.OnSuccessExecuteTaskEvent(this,task);
         }
 
         internal void SetProccesStatus(QueueTask task)
         {
             task.QueueTaskStatus = QueueTaskStatus.InProcces;
             Update(task);
-            InProccesTaskEvent?.Invoke(task);
+            //   InProccesTaskEvent?.Invoke(task);
+            Infrastructure.TaskExecutionObserver.Kernal.OnInProccesTaskEvent(this,task);
         }
 
         public IList<QueueTask> GetAll()
@@ -158,5 +185,6 @@ namespace AbstractQueue.TaskStore
             return QdbContex.QueueTasks.FirstOrDefault(predicate);
         }
 
+       
     }
 }

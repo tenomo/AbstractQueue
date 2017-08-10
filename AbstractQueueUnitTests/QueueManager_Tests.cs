@@ -1,6 +1,7 @@
 ﻿using System.Threading.Tasks;
 using AbstractQueue.Core;
-using AbstractQueue.QueueData.Entities; 
+using AbstractQueue.QueueData.Entities;
+using AbstractQueue.TaskStore;
 using Microsoft.VisualStudio.TestTools.UnitTesting;
 
 namespace AbstractQueueUnitTests
@@ -72,10 +73,10 @@ namespace AbstractQueueUnitTests
             int executedTasksCount = 1;
             const string queueName = "Test_Queue_QM_On_NumberCalculateExecuter_with_2_Workers";
             var queue = QueueFactory.CreateQueue(2, new MockTaskExecuter(), queueName);
-            queue.SuccessExecuteTaskEvent += delegate(QueueTask task)
-            {
-                executedTasksCount++;
-            };
+            queue.TaskExecutionEvents.SuccessExecuteTaskEvent += delegate(ITaskStore store, QueueTask task)
+                {
+                    executedTasksCount++;
+                };
             QueueManager.Kernal.RegistrateQueue(queue);
 
             for (int i = 0; i < itterationCount; i++)
@@ -93,7 +94,7 @@ namespace AbstractQueueUnitTests
             int executedTasksCount = 1;
             const string queueName = "Test_Queue_QM_On_NumberCalculateExecuter_with_2_Workers";
             var queue = QueueFactory.CreateQueue(2, new MockTaskExecuter(), queueName);
-            queue.SuccessExecuteTaskEvent += delegate (QueueTask task)
+            queue.TaskExecutionEvents.SuccessExecuteTaskEvent += delegate (ITaskStore store, QueueTask task)
             {
                 executedTasksCount++;
             };

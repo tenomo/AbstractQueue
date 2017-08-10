@@ -8,7 +8,7 @@ namespace AbstractQueue.QueueData.Entities
     public  sealed class QueueTask  
   {
       /// <summary>
-      /// QueueTasks id.
+      /// QueueTasks Id.
       /// </summary>
        [Key]
         public   int Id { get; set; }

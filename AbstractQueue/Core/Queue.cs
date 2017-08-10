@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Linq;
+using AbstractQueue.Infrastructure;
 using AbstractQueue.QueueData.Entities;
 
 namespace AbstractQueue.Core
@@ -16,6 +17,7 @@ namespace AbstractQueue.Core
         /// Executeble queueTask array.
         /// </summary>
         private readonly QueueWorker[] QueueWorkers;
+
 
         /// <summary>
         /// Concrete executer
@@ -37,9 +39,9 @@ namespace AbstractQueue.Core
         private AbstractTaskExecuter _executer;
         private string _queueName;
 
-        public event Action<QueueTask> InProccesTaskEvent;
-        public event Action<QueueTask> SuccessExecuteTaskEvent;
-        public event Action<QueueTask> FailedExecuteTaskEvent;
+        //public event Action<QueueTask> InProccesTaskEvent;
+        //public event Action<QueueTask> SuccessExecuteTaskEvent;
+        //public event Action<QueueTask> FailedExecuteTaskEvent;
 
         /// <summary>
         /// Current queue name
@@ -90,13 +92,14 @@ namespace AbstractQueue.Core
             this.QueueWorkersCount = queueWorkersCount;
             _executer = executer;
             attemptMaxCount = 0;
-            QueueTaskStore = new TaskStore.TaskStore();
+            QueueTaskStore = new TaskStore.TaskStore(QueueName);
             QueueWorkers = BuildWorkers(QueueWorkersCount, Executer, QueueName);
         }
 
         internal Queue(int queueWorkersCount, AbstractTaskExecuter executer, string queueName, int attemptMaxCount)
             : this(queueWorkersCount, executer, queueName)
         {
+            
             AttemptMaxCount = attemptMaxCount;
             QueueWorkers = BuildWorkers(QueueWorkersCount, Executer, QueueName, attemptMaxCount);
         }
@@ -111,9 +114,9 @@ namespace AbstractQueue.Core
                 workers[i] = new QueueWorker(executer, queueName, attemptMaxCount);
                 var buff = workers[i];
 
-                buff.SuccessExecuteTaskEvent += OnSuccessExecuteTaskEvent;
-                buff.InProccesTaskEvent += OnInProccesTaskEvent;
-                buff.FailedExecuteTaskEvent += OnFailedExecuteTaskEvent;
+                //buff.SuccessExecuteTaskEvent += OnSuccessExecuteTaskEvent;
+                //buff.InProccesTaskEvent += OnInProccesTaskEvent;
+                //buff.FailedExecuteTaskEvent += OnFailedExecuteTaskEvent;
             }
             return workers;
         }
@@ -147,25 +150,26 @@ namespace AbstractQueue.Core
             return worker;
         }
 
+        public ITaskExecutionObserver TaskExecutionEvents => Infrastructure.TaskExecutionObserver.Kernal;
 
 
-        private void OnInProccesTaskEvent(QueueTask obj)
-        {
-            InProccesTaskEvent?.Invoke(obj);
-        }
+        //private void OnInProccesTaskEvent(QueueTask obj)
+        //{
+        //    InProccesTaskEvent?.Invoke(obj);
+        //}
 
-        private void OnSuccessExecuteTaskEvent(QueueTask obj)
-        {
-            SuccessExecuteTaskEvent?.Invoke(obj);
-        }
+        //private void OnSuccessExecuteTaskEvent(QueueTask obj)
+        //{
+        //    SuccessExecuteTaskEvent?.Invoke(obj);
+        //}
 
-        /// <summary>
-        /// 
-        /// </summary>
-        /// <param name="obj"></param>
-        private void OnFailedExecuteTaskEvent(QueueTask obj)
-        {
-            FailedExecuteTaskEvent?.Invoke(obj);
-        }
+        ///// <summary>
+        ///// 
+        ///// </summary>
+        ///// <param name="obj"></param>
+        //private void OnFailedExecuteTaskEvent(QueueTask obj)
+        //{
+        //    FailedExecuteTaskEvent?.Invoke(obj);
+        //}
     }
 }

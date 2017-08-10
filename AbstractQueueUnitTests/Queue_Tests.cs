@@ -3,6 +3,7 @@ using System.Threading;
 using AbstractQueue;
 using AbstractQueue.Core;
 using AbstractQueue.QueueData.Entities;
+using AbstractQueue.TaskStore;
 using Microsoft.VisualStudio.TestTools.UnitTesting;
 
 namespace AbstractQueueUnitTests
@@ -31,11 +32,10 @@ namespace AbstractQueueUnitTests
             const string queueName = "ExecuteTasks_on_1_Worker_Test";
             int workerscount = 1;
             var queue = QueueFactory.CreateQueue(workerscount, new MockTaskExecuter(), queueName);
-            queue.SuccessExecuteTaskEvent += delegate (QueueTask task)
+            queue.TaskExecutionEvents.SuccessExecuteTaskEvent += delegate (ITaskStore store, QueueTask task)
             {
                 executedTasksCount++;
             };
-         
 
             for (int i = 0; i < itterationCount; i++)
             {
@@ -54,7 +54,7 @@ namespace AbstractQueueUnitTests
             const string queueName = "ExecuteTasks_on_4_Workers_Test";
             int workerscount = 4;
             var queue = QueueFactory.CreateQueue(workerscount, new MockTaskExecuter(), queueName);
-            queue.SuccessExecuteTaskEvent += delegate (QueueTask task)
+            queue.TaskExecutionEvents.SuccessExecuteTaskEvent += delegate (ITaskStore store, QueueTask task)
             {
                 executedTasksCount++;
             };
@@ -80,7 +80,7 @@ namespace AbstractQueueUnitTests
             int workerscount = 2;
             int attemptsCount = 3;
             var queue = QueueFactory.CreateQueueHandleFailed(workerscount, new MockTaskExecuter(), attemptsCount, queueName);
-            queue.SuccessExecuteTaskEvent += delegate (QueueTask task)
+            queue.TaskExecutionEvents.SuccessExecuteTaskEvent += delegate (ITaskStore store, QueueTask task)
             {
                 executedTasksCount++;
             };
@@ -104,7 +104,7 @@ namespace AbstractQueueUnitTests
             int workerscount = 4;
             int attemptsCount = 3;
             var queue = QueueFactory.CreateQueueHandleFailed(workerscount, new MockTaskExecuter(), attemptsCount, queueName);
-            queue.SuccessExecuteTaskEvent += delegate (QueueTask task)
+            queue.TaskExecutionEvents.SuccessExecuteTaskEvent += delegate (ITaskStore store, QueueTask task)
             {
                 executedTasksCount++;
             };

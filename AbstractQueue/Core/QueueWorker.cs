@@ -4,13 +4,14 @@ using System.Security.Policy;
 using System.Threading.Tasks;
 using AbstractQueue.Infrastructure;
 using AbstractQueue.QueueData.Entities;
+using AbstractQueue.TaskStore;
 
 namespace AbstractQueue.Core
 {
-   internal class QueueWorker : ITaskExecutionObserve
+   internal class QueueWorker //: ITaskExecutionObserver
     {
         /// <summary>
-        /// Queue worker id.
+        /// Queue worker Id.
          /// </summary>
         internal int Id { get; set; }
         /// <summary>
@@ -62,13 +63,15 @@ namespace AbstractQueue.Core
         private TaskStore.TaskStore BuildTaskStore()
         {
             var taskstore = new TaskStore.TaskStore();
-            taskstore.SuccessExecuteTaskEvent += ExecutedTaskEvent;
-             taskstore.FailedExecuteTaskEvent += ExecutedTaskEvent;
+            Infrastructure.TaskExecutionObserver.Kernal.FailedExecuteTaskEvent += ExecutedTaskEvent;
+            Infrastructure.TaskExecutionObserver.Kernal.SuccessExecuteTaskEvent += ExecutedTaskEvent;
+            //taskstore.SuccessExecuteTaskEvent += ExecutedTaskEvent;
+            // taskstore.FailedExecuteTaskEvent += ExecutedTaskEvent;
 
 
-            taskstore.SuccessExecuteTaskEvent += OnSuccessExecuteTaskEvent;
-            taskstore.InProccesTaskEvent += OnInProccesTaskEvent;
-            taskstore.FailedExecuteTaskEvent += OnFailedExecuteTaskEvent;
+          //  taskstore.SuccessExecuteTaskEvent += OnSuccessExecuteTaskEvent;
+          //  taskstore.InProccesTaskEvent += OnInProccesTaskEvent;
+          //  taskstore.FailedExecuteTaskEvent += OnFailedExecuteTaskEvent;
             return taskstore;
         }
             
@@ -103,10 +106,13 @@ namespace AbstractQueue.Core
         /// Executed queueTask handler.
         /// </summary>
         /// <param name="queueTask"></param>
-        private void ExecutedTaskEvent(QueueTask queueTask)
+        private void ExecutedTaskEvent(ITaskStore obj ,QueueTask e)
         {
-            SetStatusFree();
-            TryStartNextTask();
+            if (obj.Id == this.WorkerTaskStore.Id)
+            {
+                SetStatusFree();
+                TryStartNextTask();
+            }
         }
 
 
@@ -267,23 +273,23 @@ namespace AbstractQueue.Core
             WorkerTaskStore.Update(task);
         }
 
-        public event Action<QueueTask> SuccessExecuteTaskEvent;
-        public event Action<QueueTask> FailedExecuteTaskEvent;
-        public event Action<QueueTask> InProccesTaskEvent;
+        //public event Action<QueueTask> SuccessExecuteTaskEvent;
+        //public event Action<QueueTask> FailedExecuteTaskEvent;
+        //public event Action<QueueTask> InProccesTaskEvent;
 
-        protected virtual void OnSuccessExecuteTaskEvent(QueueTask obj)
-        {
-            SuccessExecuteTaskEvent?.Invoke(obj);
-        }
+        //protected virtual void OnSuccessExecuteTaskEvent(QueueTask obj)
+        //{
+        //    SuccessExecuteTaskEvent?.Invoke(obj);
+        //}
 
-        protected virtual void OnFailedExecuteTaskEvent(QueueTask obj)
-        {
-            FailedExecuteTaskEvent?.Invoke(obj);
-        }
+        //protected virtual void OnFailedExecuteTaskEvent(QueueTask obj)
+        //{
+        //    FailedExecuteTaskEvent?.Invoke(obj);
+        //}
 
-        protected virtual void OnInProccesTaskEvent(QueueTask obj)
-        {
-            InProccesTaskEvent?.Invoke(obj);
-        }
+        //protected virtual void OnInProccesTaskEvent(QueueTask obj)
+        //{
+        //    InProccesTaskEvent?.Invoke(obj);
+        //}
     }
 }

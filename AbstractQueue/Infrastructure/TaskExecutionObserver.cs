@@ -1,28 +1,29 @@
 ﻿using System;
 using AbstractQueue.QueueData.Entities;
+using AbstractQueue.TaskStore;
 
 namespace AbstractQueue.Infrastructure
 {
-  internal  class TaskExecutionObserver: Singleton<TaskExecutionObserver>,ITaskExecutionObserve
+  internal  class TaskExecutionObserver: Singleton<TaskExecutionObserver>,ITaskExecutionObserver
     {
-        public event Action<QueueTask> SuccessExecuteTaskEvent;
-        public event Action<QueueTask> FailedExecuteTaskEvent;
-        public event Action<QueueTask> InProccesTaskEvent;
+        public event Action<ITaskStore, QueueTask  > SuccessExecuteTaskEvent;
+        public event Action<ITaskStore, QueueTask> FailedExecuteTaskEvent;
+        public event Action<ITaskStore, QueueTask> InProccesTaskEvent;
 
 
-        internal void OnSuccessExecuteTaskEvent(QueueTask obj)
+        internal void OnSuccessExecuteTaskEvent(ITaskStore obj , QueueTask e )
         {
-            SuccessExecuteTaskEvent?.Invoke(obj);
+            SuccessExecuteTaskEvent?.Invoke(obj,e);
         }
 
-        internal virtual void OnFailedExecuteTaskEvent(QueueTask obj)
+        internal virtual void OnFailedExecuteTaskEvent(ITaskStore obj, QueueTask e)
         {
-            FailedExecuteTaskEvent?.Invoke(obj);
+            FailedExecuteTaskEvent?.Invoke(obj, e);
         }
 
-        internal virtual void OnInProccesTaskEvent(QueueTask obj)
+        internal virtual void OnInProccesTaskEvent(ITaskStore obj, QueueTask e)
         {
-            InProccesTaskEvent?.Invoke(obj);
+            InProccesTaskEvent?.Invoke(obj, e);
         }
     }
 }
