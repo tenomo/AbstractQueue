@@ -11,70 +11,94 @@ namespace AbstractQueue.Core
         /// <summary>
         /// Count workers.
         /// </summary>
-        private readonly int QueueWorkersCount;
+        private  int queueWorkersCount;
 
         /// <summary>
         /// Executeble queueTask array.
         /// </summary>
-        private readonly QueueTask[] QueueWorkers;
+        private readonly QueueWorker[] QueueWorkers;
         /// <summary>
         /// Concrete executer
         /// </summary>
         private readonly AbstractTaskExecuter Executer;
+ 
+        private  int attemptMaxCount;
 
-        private  bool isTryHandleError = false;
-        private  int AttemptMaxCount;
-        
-        /// <summary>
-        /// QueueTasks TaskStore.
-        /// </summary>
-        private volatile   TaskStore.TaskStore TaskStore;
+        private readonly TaskStore.TaskStore QueueTaskStore;
 
-        /// <summary>
-        /// Invoke at executed any task
-        /// </summary>
-        public event Action<QueueTask> ExecutedTaskEvent;
+        public event Action<QueueTask> InProccesTaskEvent;
+        public event Action<QueueTask> SuccessExecuteTaskEvent;
+        public event Action<QueueTask> FailedExecuteTaskEvent;
 
         /// <summary>
         /// Current queue name
         /// </summary>
         public string QueueName { get; set; }
 
-        public int CountHandleFailed
+        public int AttemptMaxCount
         {
             get { return AttemptMaxCount; }
             private set
-            {
-                if (value > 1)
-                    isTryHandleError = true;
-                else if (value<0)
+            { 
+                  if (value<0)
                 {
-                    throw new ArgumentException("CountHandleFailed must be more 0");
+                    throw new ArgumentException("AttemptMaxCount must be more 0");
                 }
 
                 AttemptMaxCount = value;
             }
         }
 
+        /// <summary>
+        /// Count workers.
+        /// </summary>
+        public int QueueWorkersCount
+        {
+            get { return queueWorkersCount; }
+            private set
+            {
+                if (queueWorkersCount < 0)
+                    throw new ArgumentException("The queue Workers count must be more 0");
+                queueWorkersCount = value;
+            }
+        }
+
+
         internal Queue(int queueWorkersCount, AbstractTaskExecuter executer , string queueName)
         {
             QueueName = queueName; 
-            QueueWorkersCount = queueWorkersCount;
-            QueueWorkers = new QueueTask[queueWorkersCount];
+            this.QueueWorkersCount = queueWorkersCount;
             Executer = executer;
-            TaskStore = new TaskStore.TaskStore();
-            TaskStore.ExecutedTaskEvent += TaskEventExecuted;
-            TaskStore.FailedExecuteTaskEvent += TaskEventExecuted;
-            isTryHandleError = false;
-            AttemptMaxCount = -1; 
+            attemptMaxCount = 0;
+            QueueTaskStore = new TaskStore.TaskStore();
+            QueueWorkers = BuildWorkers(QueueWorkersCount, executer,queueName);
         }
+
+        internal Queue(int queueWorkersCount, AbstractTaskExecuter executer, string queueName, int attemptMaxCount)
+           : this(queueWorkersCount, executer, queueName)
+        {
+            AttemptMaxCount = attemptMaxCount;
+            QueueWorkers = BuildWorkers(QueueWorkersCount, executer, queueName, attemptMaxCount);
+        }
+
+        private   QueueWorker[] BuildWorkers(int queueWorkersCount, AbstractTaskExecuter executer, string queueName, int attemptMaxCount = 0)
+        {
+            var workers = new QueueWorker[queueWorkersCount];
+
+            for (int i = queueWorkersCount - 1; i >= 0; i--)
+            {
+                workers[i] = new QueueWorker(executer,queueName, attemptMaxCount);
+                var buff = workers[i];
+
+                buff.SuccessExecuteTaskEvent += OnSuccessExecuteTaskEvent;
+                buff.InProccesTaskEvent += OnInProccesTaskEvent;
+                buff.FailedExecuteTaskEvent += OnFailedExecuteTaskEvent;
+            }
+            return workers;
+        }
+
 
        
-
-        internal Queue(int queueWorkersCount, AbstractTaskExecuter executer , string queueName, int countHandleFailed) : this(queueWorkersCount, executer   , queueName)
-        {
-            CountHandleFailed = countHandleFailed;
-        }
 
         /// <summary>
         /// Add new task to queue
@@ -84,170 +108,38 @@ namespace AbstractQueue.Core
         public int AddTask(QueueTask queueTask)
         {
             queueTask.QueueName = QueueName;
-            TaskStore.Add(queueTask);
-            TryStartTask();
-            return TaskStore.IndexOf(queueTask);
+            QueueTaskStore.Add(queueTask);
+            return QueueTaskStore.IndexOf(queueTask);
         }
 
-        /// <summary>
-        /// Executed queueTask handler.
-        /// </summary>
-        /// <param name="queueTask"></param>
-        private void TaskEventExecuted(QueueTask queueTask)
+
+        private void TryExecuteTask()
         {
-            ExecutedTaskEvent?.Invoke(queueTask);
-            TryStartTask(queueTask.TaskIndexInQueue);
+            var worker = GetWorker();
+            worker?.TryStartTask();
         }
 
-
-       /// <summary>
-       /// Try execute task.
-       /// </summary>
-        private void TryStartTask()
+        private QueueWorker GetWorker()
         {
-            var isCan = false;
-            var workerId = 0;
-            IsCanExecuteTask(out isCan, out workerId);
-            if (!isCan) return;
-
-            var executeTask = QueueWorkers[workerId];
-            UpAttempt(executeTask);
-            TaskStore.SetProccesStatus(executeTask);
-
-            new TaskFactory().StartNew(() =>
-            {
-                try
-                {
-                    Executer.Execute(executeTask);
-                    TaskStore.SetSuccessStatus(executeTask);
-                }
-                catch
-                {
-                    TaskStore.SetFailedStatus(executeTask);
-                }
-            });
+            var worker = QueueWorkers.FirstOrDefault(each => each.InProccess == false);
+            return worker;
         }
-        /// <summary>
-        /// Try execute task.
-        /// </summary>
-        private void TryStartTask(int workerId)
+
+       
+
+        protected virtual void OnInProccesTaskEvent(QueueTask obj)
         {
-            bool isCan = false;
-            IsCanExecuteTask(out isCan, workerId);
-            if (!isCan) return;
-
-            var executeTask = QueueWorkers[workerId];
-            UpAttempt(executeTask);
-            TaskStore.SetProccesStatus(executeTask);
-                try
-                {
-                    Executer.Execute(executeTask);
-                    TaskStore.SetSuccessStatus(executeTask);
-                }
-                catch
-                {
-                    TaskStore.SetFailedStatus(executeTask);
-                }
+            InProccesTaskEvent?.Invoke(obj);
         }
 
-        /// <summary>
-        /// Check executeble queueTask and return boolean value and queueTask workerId.
-        /// </summary>
-        /// <param name="isCan"></param>
-        /// <param name="index"></param>
-        private void IsCanExecuteTask(out bool isCan, out int index)
+        protected virtual void OnSuccessExecuteTaskEvent(QueueTask obj)
         {
-             index = 0;
-/*
-            isCan = false;
-*/
-            var queueWorkers = QueueWorkers;
-            var countExecuteTasks = queueWorkers.Count(CheckQueueTaskStatus);
-            var queueWorkerCount = QueueWorkersCount;
-
-             var task = TaskStore.GetAll().FirstOrDefault(each =>  CheckQueueTaskStatus(each ) && each.QueueName == QueueName);
-
-            isCan = countExecuteTasks < queueWorkerCount && task != null;
-
-            if (!isCan) return;
-
-            for (var i= 0; i < queueWorkerCount; i++)
-            {
-                index = i;
-                var currentWorker = queueWorkers[index];
-
-                if (currentWorker != null && !CheckQueueTaskStatus(currentWorker) &&
-                    !CheckTaskOnAttemptLimit(currentWorker)) continue;
-
-                queueWorkers[index] = task;
-                queueWorkers[index].TaskIndexInQueue = index;
-                TaskStore.Update(task);
-                return;
-            }
+            SuccessExecuteTaskEvent?.Invoke(obj);
         }
 
-        /// <summary>
-        /// Check executeble queueTask by on executed task place and return boolean.
-        /// </summary>
-        /// <param name="isCan"></param>
-        /// <param name="index"></param>
-        /// <param name="index"></param>
-        private void IsCanExecuteTask(out bool isCan,  int index)
+        protected virtual void OnFailedExecuteTaskEvent(QueueTask obj)
         {
-            var queueWorkers = QueueWorkers;
-            var queueWorkerCount = QueueWorkersCount;
-/*
-            isCan = false;
-*/
-            int countExecuteTasks = queueWorkers.Count(CheckQueueTaskStatus);
-            var task = TaskStore.GetAll().FirstOrDefault(each => CheckQueueTaskStatus(each) && each.QueueName == QueueName);
-
-            isCan = countExecuteTasks < queueWorkerCount && task != null;
-            if (!isCan) return;
-            queueWorkers[index] = task;
-            queueWorkers[index].TaskIndexInQueue = index;
-            TaskStore.Update(task);
+            FailedExecuteTaskEvent?.Invoke(obj);
         }
-
-
-        private bool CheckQueueTaskStatus(QueueTask task  )
-        {
-            var _isHandleFailed = this.isTryHandleError;
-            if (_isHandleFailed)
-            {
-
-                return task != null &&
-                       (task?.QueueTaskStatus == QueueTaskStatus.Created || task.QueueTaskStatus == QueueTaskStatus.Failed);
-        }
-            else
-                return task?.QueueTaskStatus == QueueTaskStatus.Created;
-        }
-
-        private bool CheckTaskOnAttemptLimit(QueueTask task)
-        {
-            var countHandleFailed = CountHandleFailed;
-            if (task == null || isTryHandleError == false)
-                return true;
-            return task.QueueTaskStatus == QueueTaskStatus.Failed && task.Attempt <= countHandleFailed;
-        }
-
-        /// <summary>
-        /// Iterate the execution task attempt. 
-        /// </summary>
-        /// <param name="task"></param>
-        private void UpAttempt(QueueTask task)
-        {
-            task.Attempt++;
-            TaskStore.Update(task);
-        }
-
-
-        //TODO GetWorker method on base IsCanExecuteTask method
-
-        //TODO Worker on base this Queue class
-             //TODO One task and hes childrens in self thread
-
-
-
     }
 }

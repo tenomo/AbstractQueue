@@ -15,7 +15,7 @@ namespace AbstractQueue.TaskStore
 
         int Count { get; }
         bool IsReadOnly { get; }
-        event Action<QueueTask> ExecutedTaskEvent;
+        event Action<QueueTask> SuccessExecuteTaskEvent;
         event Action<QueueTask> FailedExecuteTaskEvent;
         event Action<QueueTask> InProccesTaskEvent;
         void Add(QueueTask item);

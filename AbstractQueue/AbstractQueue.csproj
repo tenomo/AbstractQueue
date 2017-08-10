@@ -54,6 +54,7 @@
     <Compile Include="Config.cs" />
     <Compile Include="Core\IQueue.cs" />
     <Compile Include="Core\QueueWorker.cs" />
+    <Compile Include="Core\TaskExecutionObaerve.cs" />
     <Compile Include="QueueData\Context\QueueDataBaseContext.cs" />
     <Compile Include="Core\QueueManager.cs" />
     <Compile Include="Logger.cs" />

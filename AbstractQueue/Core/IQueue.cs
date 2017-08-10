@@ -3,13 +3,14 @@ using AbstractQueue.QueueData.Entities;
 
 namespace AbstractQueue.Core
 {
-    public interface IQueue
+    internal interface IQueue : TaskExecutionObaerve
     {
-        int CountHandleFailed { get; }
+        int AttemptMaxCount { get; }
         string QueueName { get; set; }
-
-        event Action<QueueTask> ExecutedTaskEvent;
+         
+       
 
         int AddTask(QueueTask queueTask);
+
     }
 }

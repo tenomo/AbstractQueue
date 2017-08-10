@@ -15,7 +15,7 @@ namespace AbstractQueue.TaskStore
        
         private QueueDataBaseContext QDBContex => new QueueDataBaseContext();
 
-        public event Action<QueueTask> ExecutedTaskEvent;
+        public event Action<QueueTask> SuccessExecuteTaskEvent;
         public event Action<QueueTask> FailedExecuteTaskEvent;
         public event Action<QueueTask> InProccesTaskEvent;
         private IQueryable<QueueTask> QueueTasks => QDBContex.QueueTasks;
@@ -44,7 +44,7 @@ namespace AbstractQueue.TaskStore
         }
         internal TaskStore( )
         { 
-            ExecutedTaskEvent += TaskStore_SetStatus;
+            SuccessExecuteTaskEvent += TaskStore_SetStatus;
             FailedExecuteTaskEvent += TaskStore_SetStatus;
             InProccesTaskEvent += TaskStore_SetStatus;
             
@@ -66,7 +66,7 @@ namespace AbstractQueue.TaskStore
             task.QueueTaskStatus = QueueTaskStatus.Success;
             task.ExecutedDate = DateTime.Now;
             Update(task);
-            ExecutedTaskEvent?.Invoke(task);
+            SuccessExecuteTaskEvent?.Invoke(task);
         }
         internal void SetProccesStatus(QueueTask task)
         {
