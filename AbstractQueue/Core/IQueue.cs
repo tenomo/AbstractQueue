@@ -1,7 +1,7 @@
 ﻿using AbstractQueue.QueueData.Entities;
 namespace AbstractQueue.Core
 {
-    internal interface IQueue   :   ITaskExecutionObserve
+    public  interface IQueue   :   ITaskExecutionObserve
     {
         int AttemptMaxCount { get; }
         string QueueName { get; set; }

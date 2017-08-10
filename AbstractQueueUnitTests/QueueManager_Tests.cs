@@ -3,6 +3,8 @@ using System.Collections.Generic;
 using System.Data.Entity;
 using System.Linq;
 using AbstractQueue;
+using AbstractQueue.Core;
+using AbstractQueue.QueueData.Entities;
 using AbstractQueueUnitTests.Mocks;
 using Microsoft.VisualStudio.TestTools.UnitTesting;
 using Microsoft.VisualStudio.TestTools.UnitTesting.Logging;

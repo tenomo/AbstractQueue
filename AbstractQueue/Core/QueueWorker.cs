@@ -61,22 +61,20 @@ namespace AbstractQueue.Core
         private TaskStore.TaskStore BuildTaskStore()
         {
             var taskstore = new TaskStore.TaskStore();
-            this.WorkerTaskStore.SuccessExecuteTaskEvent += ExecutedTaskEvent;
-            this.WorkerTaskStore.FailedExecuteTaskEvent += ExecutedTaskEvent;
+            taskstore.SuccessExecuteTaskEvent += ExecutedTaskEvent;
+             taskstore.FailedExecuteTaskEvent += ExecutedTaskEvent;
 
 
-            this.WorkerTaskStore.SuccessExecuteTaskEvent += OnSuccessExecuteTaskEvent;
-            this.WorkerTaskStore.InProccesTaskEvent += OnInProccesTaskEvent;
-            this.WorkerTaskStore.FailedExecuteTaskEvent += OnFailedExecuteTaskEvent;
-
-
+            taskstore.SuccessExecuteTaskEvent += OnSuccessExecuteTaskEvent;
+            taskstore.InProccesTaskEvent += OnInProccesTaskEvent;
+            taskstore.FailedExecuteTaskEvent += OnFailedExecuteTaskEvent;
             return taskstore;
         }
             
 
         public QueueWorker(AbstractTaskExecuter executer, string queueName, int attemptMaxCount = 0)
         {
-            BuildTaskStore();
+            this.WorkerTaskStore = BuildTaskStore();
           this.TryStartTask();
             this.Executer = executer;
             this.AttemptMaxCount = attemptMaxCount;
@@ -190,10 +188,9 @@ namespace AbstractQueue.Core
         /// <param name="index"></param>
         private bool IsCanExecuteTask( )
         {
-
-            var task =
-                WorkerTaskStore.GetAll()
-                    .FirstOrDefault(each => CheckStatus(each) && each.QueueName == queueName);
+             
+            var task = WorkerTaskStore.FirstOrDefault(each => CheckStatus(each) && each.QueueName == queueName);
+    
 
            var isCan = task != null;
 

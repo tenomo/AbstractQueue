@@ -5,25 +5,25 @@
         /// <summary>
         /// Create Queue which the try handle failed task n times.
         /// </summary>
-        /// <param name="threadCount"></param>
+        /// <param name="workersCount"></param>
         /// <param name="executer"></param>
         /// <param name="isHandleFailed"></param>
-        /// <param name="countHandleFailed"></param>
+        /// <param name="HandleFailedAttempsCount"></param>
         /// <returns></returns>
-        public static IQueue CreateQueueHandleFailed(int threadCount, AbstractTaskExecuter executer,int countHandleFailed ,string queueName)
+        public static IQueue CreateQueueHandleFailed(int workersCount, AbstractTaskExecuter executer,int HandleFailedAttempsCount ,string queueName)
         {
-            return new Queue(threadCount, executer,  queueName, countHandleFailed);
+            return new Queue(workersCount, executer,  queueName, HandleFailedAttempsCount);
         }
 
         /// <summary>
         /// Create Queue.
         /// </summary>
-        /// <param name="threadCount"></param>
+        /// <param name="workersCount"></param>
         /// <param name="executer"></param>
         /// <returns></returns>
-        public static IQueue CreateQueue(int threadCount, AbstractTaskExecuter executer, string queueName)
+        public static IQueue CreateQueue(int workersCount, AbstractTaskExecuter executer, string queueName)
         {
-            return new Queue(threadCount, executer,  queueName);
+            return new Queue(workersCount, executer,  queueName);
         }
     }
 }
