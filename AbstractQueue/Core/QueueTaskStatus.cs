@@ -1,4 +1,4 @@
-﻿namespace AbstractQueue
+﻿namespace AbstractQueue.Core
 {
     /// <summary>
     /// Status which the determinate task.
@@ -26,7 +26,7 @@
         /// </summary>
         NotProccess = Failed | Success | Created,
 
-        TryFailInProcces =  InProcces  
+      //  TryFailInProcces =  InProcces  
 
        
     }

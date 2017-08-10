@@ -8,6 +8,6 @@ namespace AbstractQueue
 {
   public  class Config
     {
-        public static string ConnectionString { get; set; }  = "DefaultConnection";
+        public static string ConnectionStringName { get; set; }  = "DefaultConnection";
     }
 }
