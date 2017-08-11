@@ -12,6 +12,7 @@ namespace AbstractQueue.QueueData.Context
 
         internal static DbContextWrapper GetFreeDbContext()
         {
+            
          var freeContext=   pool.FirstOrDefault(each => each.InProccess == false);
             if (freeContext == null)
             {
@@ -19,7 +20,7 @@ namespace AbstractQueue.QueueData.Context
                 return GetFreeDbContext();
             }
 
-            Clear();
+            
             freeContext.SetStatusBusy();
             return freeContext;
 
@@ -36,16 +37,20 @@ namespace AbstractQueue.QueueData.Context
 
                 foreach (var VARIABLE in excess)
                 {
+                    VARIABLE.QueueDataBaseContext.Database.Connection.Close();
                     VARIABLE.QueueDataBaseContext.Dispose();
                     pool.Remove(VARIABLE);
                 }
             
             }
+
+            Logger.Log("Clear pool: deleted: " + freeDbContextWrappers.Count() + " elements");
         }
 
         internal static void ReturnToPool(DbContextWrapper obj)
         { 
             obj.SetStatusFree();
+            Clear();
         }
 
 

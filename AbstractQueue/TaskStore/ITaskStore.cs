@@ -15,21 +15,11 @@ namespace AbstractQueue.TaskStore
         QueueTask this[int index] { get; set; }
         string QueueName { get;   }
         string Id { get; }
-        int Count { get; }
-        bool IsReadOnly { get; }
-        //event Action<QueueTask> SuccessExecuteTaskEvent;
-        //event Action<QueueTask> FailedExecuteTaskEvent;
-        //event Action<QueueTask> InProccesTaskEvent;
         void Add(QueueTask item);
         void Clear();
-        bool Contains(QueueTask item);
-        void CopyTo(QueueTask[] array, int arrayIndex);
         void DeleteById(string id);
-        IEnumerable<QueueTask> FindBy(Expression<Func<QueueTask, bool>> predicate);
         QueueTask FirstOrDefault(Expression<Func<QueueTask, bool>> predicate);
-        QueueTask Get(QueueTask entity);
         IList<QueueTask> GetAll();
-        QueueTask GetById(int id);
         int IndexOf(QueueTask item);
         void SetFailedStatus(QueueTask task);
         void SetSuccessStatus(QueueTask task);

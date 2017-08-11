@@ -9,6 +9,7 @@ namespace AbstractQueue.QueueData.Context
 {
    internal class DbContextWrapper : IBusy
    {
+       private bool _inProccess;
        internal QueueDataBaseContext QueueDataBaseContext { get; private set; }
 
        public DbContextWrapper( )
@@ -16,9 +17,25 @@ namespace AbstractQueue.QueueData.Context
             QueueDataBaseContext = new QueueDataBaseContext(Config.ConnectionStringName);
             SetStatusFree();
        }
+        static object lockeObj = new object();
+        public bool InProccess
+       {
+           get { 
+               lock (lockeObj)
+               {
+                    return _inProccess;
+               }
+           }
+           private set
+            {
+                lock (lockeObj)
+                {
+                      _inProccess = value;
+                }
+            }
+       }
 
-        public bool InProccess { get; private set; }
-        public void SetStatusBusy()
+       public void SetStatusBusy()
         {
             InProccess = true;
         }

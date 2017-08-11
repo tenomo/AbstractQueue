@@ -45,10 +45,13 @@ namespace AbstractQueue.TaskStore
 
                 return _qdbContex;
             }
-            set { _qdbContex = value; }
+            
         }
          
         private IQueryable<QueueTask> QueueTasks => QdbContex.QueueTasks;
+
+
+        
 
         internal TaskStore(string queueName)
         { 
@@ -61,14 +64,20 @@ namespace AbstractQueue.TaskStore
             Infrastructure.TaskExecutionObserver.Kernal.InProccesTaskEvent += TaskStore_SetStatus;
 
         }
-
+        static object lockObj = new object();
         public void Add(QueueTask item)
         {
             try
             {
-                QdbContex.QueueTasks.Add(item);
-                QdbContex.SaveChanges();
-                QdbContex.Database.Connection.Close();
+                lock (lockObj)
+                {
+                     var dbcWrapper = DbContextPool.GetFreeDbContext();
+                dbcWrapper.QueueDataBaseContext.QueueTasks.Add(item);
+                dbcWrapper.QueueDataBaseContext.SaveChanges();
+                dbcWrapper.QueueDataBaseContext.Database.Connection.Close();
+                DbContextPool.ReturnToPool(dbcWrapper);
+                }
+               
             }
             catch (Exception e)
             {
@@ -86,10 +95,10 @@ namespace AbstractQueue.TaskStore
             QdbContex.SaveChanges();
         }
 
-        public bool Contains(QueueTask item) => QueueTasks.Contains(item);
-        public void CopyTo(QueueTask[] array, int arrayIndex) => QueueTasks.ToList().CopyTo(array, arrayIndex);
-        public int Count => QueueTasks.ToList().Count;
-        public bool IsReadOnly => false;
+        
+         
+      
+        
         public int IndexOf(QueueTask item) => QueueTasks.ToList().IndexOf(item);
 
         public QueueTask this[int index]
@@ -140,64 +149,33 @@ namespace AbstractQueue.TaskStore
             return QdbContex.QueueTasks.ToList();
         }
 
-        public QueueTask GetById(int id)
-        {
-            return QdbContex.QueueTasks.Find(id);
-        }
+       
 
-        private QueueTask GetById(int id, QueueDataBaseContext QdbContex)
-        {
-            return QdbContex.QueueTasks.Find(id);
-        }
-
+        
         public QueueTask GetById(string id)
         {
             return QdbContex.QueueTasks.Find(id);
         }
 
-        public QueueTask Get(QueueTask entity)
-        {
-            return QdbContex.QueueTasks.Find(entity);
-        }
-
+       
         public void Update (QueueTask entity)
         {
-            try
-            {
-                var task = GetById(entity.Id);
-                if (task == null) return;
-                task.QueueTaskStatus = entity.QueueTaskStatus;
-                task.Body = entity.Body;
-                task.Type = entity.Type;
-                task.Attempt = entity.Attempt;
-                task.CreationDate = entity.CreationDate;
-                task.QueueName = entity.QueueName;
-                task.TaskIndexInQueue = entity.TaskIndexInQueue;
-                task.ExecutedDate = entity.ExecutedDate;
-                QdbContex.SaveChanges();
-            }
-            catch (Exception e)
-            {
-                QdbContex.Database.Connection.Close();
-                QdbContex.Dispose();
-                var dbcWrapper = DbContextPool.GetFreeDbContext();
-                QdbContex = dbcWrapper.QueueDataBaseContext;
-                var task = GetById(entity.Id);
-                if (task == null) return;
-                task.QueueTaskStatus = entity.QueueTaskStatus;
-                task.Body = entity.Body;
-                task.Type = entity.Type;
-                task.Attempt = entity.Attempt;
-                task.CreationDate = entity.CreationDate;
-                task.QueueName = entity.QueueName;
-                task.TaskIndexInQueue = entity.TaskIndexInQueue;
-                task.ExecutedDate = entity.ExecutedDate;
-                QdbContex.SaveChanges();
-                DbContextPool.ReturnToPool(dbcWrapper);
-
-            }
-           
+            var dbcWrapper = DbContextPool.GetFreeDbContext();
+            var task = GetById(entity.Id);
+            if (task == null) return;
+            task.QueueTaskStatus = entity.QueueTaskStatus;
+            task.Body = entity.Body;
+            task.Type = entity.Type;
+            task.Attempt = entity.Attempt;
+            task.CreationDate = entity.CreationDate;
+            task.QueueName = entity.QueueName;
+            task.TaskIndexInQueue = entity.TaskIndexInQueue;
+            task.ExecutedDate = entity.ExecutedDate;
+            dbcWrapper.QueueDataBaseContext.SaveChanges();
+            DbContextPool.ReturnToPool(dbcWrapper);
         }
+
+        
 
          
 
@@ -208,10 +186,7 @@ namespace AbstractQueue.TaskStore
             QdbContex.SaveChanges();
         }
 
-        public IEnumerable<QueueTask> FindBy(System.Linq.Expressions.Expression<Func<QueueTask, bool>> predicate)
-        {
-            return QdbContex.QueueTasks.Where(predicate).ToList();
-        }
+     
 
         public IEnumerable<QueueTask> Where(System.Linq.Expressions.Expression<Func<QueueTask, bool>> predicate)
         {
