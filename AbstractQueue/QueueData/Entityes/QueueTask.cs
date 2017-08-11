@@ -1,5 +1,6 @@
 ﻿using System;
 using System.ComponentModel.DataAnnotations;
+using System.ComponentModel.DataAnnotations.Schema;
 using AbstractQueue.Core;
 
 namespace AbstractQueue.QueueData.Entities
@@ -7,12 +8,14 @@ namespace AbstractQueue.QueueData.Entities
   [Serializable]
     public  sealed class QueueTask  
   {
-      /// <summary>
-      /// QueueTasks id.
-      /// </summary>
-       [Key]
-        public   int Id { get; set; }
-         
+        /// <summary>
+        /// QueueTasks Id.
+        /// </summary>
+        //[Key]
+        // public   int Id { get; set; }
+         [Key, DatabaseGenerated(DatabaseGeneratedOption.None)]
+          public   string Id { get; set; }
+
         public int TaskIndexInQueue { get; set; }
         /// <summary>
         ///  Queue name which the belongs task.
@@ -25,7 +28,7 @@ namespace AbstractQueue.QueueData.Entities
         /// <summary>
         /// QueueTasks type for determinate the executer(custom value).
         /// </summary>
-        public byte Type { get; set; }
+        public byte? Type { get; set; }
         /// <summary>
         /// QueueTasks body as Json for execution.
         /// </summary>
@@ -54,14 +57,12 @@ namespace AbstractQueue.QueueData.Entities
         {
             return new QueueTask()
             {
+                Id =  Guid.NewGuid().ToString(),
                 QueueTaskStatus = QueueTaskStatus.Created,
                 Type = type,
                 Body = body,
                 CreationDate = DateTime.Now,
             };
         }
-
-
-
     }
 }

@@ -1,28 +1,47 @@
 ﻿using System;
+using System.Runtime.CompilerServices;
 using AbstractQueue.QueueData.Entities;
+using AbstractQueue.TaskStore;
 
 namespace AbstractQueue.Infrastructure
-{
-  internal  class TaskExecutionObserver: Singleton<TaskExecutionObserver>,ITaskExecutionObserve
+{    
+  internal   class TaskExecutionObserver : ITaskExecutionObserver // Singleton<TaskExecutionObserver>,ITaskExecutionObserver
     {
-        public event Action<QueueTask> SuccessExecuteTaskEvent;
-        public event Action<QueueTask> FailedExecuteTaskEvent;
-        public event Action<QueueTask> InProccesTaskEvent;
+  
+ 
 
+        public event Action<ITaskStore, QueueTask  > SuccessExecuteTaskEvent;
+        public event Action<ITaskStore, QueueTask> FailedExecuteTaskEvent;
+        public event Action<ITaskStore, QueueTask> InProccesTaskEvent;
 
-        internal void OnSuccessExecuteTaskEvent(QueueTask obj)
+        
+
+        protected TaskExecutionObserver() { }
+
+        private sealed class TaskExecutionObserverCreator
         {
-            SuccessExecuteTaskEvent?.Invoke(obj);
+            private static readonly TaskExecutionObserver instance = new TaskExecutionObserver();
+            public static TaskExecutionObserver Instance { get { return instance; } }
         }
 
-        internal virtual void OnFailedExecuteTaskEvent(QueueTask obj)
+        public static TaskExecutionObserver Kernal
         {
-            FailedExecuteTaskEvent?.Invoke(obj);
+            get { return TaskExecutionObserverCreator.Instance; }
         }
 
-        internal virtual void OnInProccesTaskEvent(QueueTask obj)
+        internal void OnSuccessExecuteTaskEvent(ITaskStore obj , QueueTask e )
         {
-            InProccesTaskEvent?.Invoke(obj);
+            SuccessExecuteTaskEvent?.Invoke(obj,e);
+        }
+
+        internal void OnFailedExecuteTaskEvent(ITaskStore obj, QueueTask e)
+        {
+            FailedExecuteTaskEvent?.Invoke(obj, e);
+        }
+
+        internal void OnInProccesTaskEvent(ITaskStore obj, QueueTask e)
+        {
+            InProccesTaskEvent?.Invoke(obj, e);
         }
     }
 }

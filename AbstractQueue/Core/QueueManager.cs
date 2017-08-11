@@ -8,12 +8,12 @@ using AbstractQueue.QueueData.Entities;
 
 namespace AbstractQueue.Core
 {
-    public sealed  class QueueManager   : Singleton<QueueManager>
+    public sealed  class QueueManager  // : Singleton<QueueManager>
     {
         private ITaskStore taslStore;
         private Timer timer;
         /// защищённый конструктор нужен, чтобы предотвратить создание экземпляра класса Singleton
-        protected QueueManager()
+        protected QueueManager() // : base()
         {
             queues = new Dictionary<string, IQueue>();
             taslStore = new TaskStore.TaskStore();
@@ -68,6 +68,21 @@ namespace AbstractQueue.Core
 
 
         public   Config Config { get; set; }
+
+
+
+     
+
+        private sealed class QueueManagerrCreator
+        {
+            private static readonly QueueManager instance = new QueueManager();
+            public static QueueManager Instance { get { return instance; } }
+        }
+
+        public static QueueManager Kernal
+        {
+            get { return QueueManagerrCreator.Instance; }
+        }
 
     }
 }

@@ -24,6 +24,11 @@ namespace AbstractQueue.QueueData.Context
             dbInitializerStrategy = new CreateDatabaseIfNotExists<QueueDataBaseContext>();
             Database.SetInitializer(dbInitializerStrategy);
 
-        } 
+        }
+
+
+      
     }
+
+
 }

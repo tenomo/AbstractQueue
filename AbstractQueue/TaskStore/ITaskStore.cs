@@ -10,21 +10,22 @@ namespace AbstractQueue.TaskStore
     /// <summary>
     /// Task the provide thread-safe interface for work with queue database contex
     /// </summary>
-    public interface ITaskStore : ITaskExecutionObserve
+    public interface ITaskStore  
     {
         QueueTask this[int index] { get; set; }
-
+        string QueueName { get;   }
+        string Id { get; }
         int Count { get; }
         bool IsReadOnly { get; }
-        event Action<QueueTask> SuccessExecuteTaskEvent;
-        event Action<QueueTask> FailedExecuteTaskEvent;
-        event Action<QueueTask> InProccesTaskEvent;
+        //event Action<QueueTask> SuccessExecuteTaskEvent;
+        //event Action<QueueTask> FailedExecuteTaskEvent;
+        //event Action<QueueTask> InProccesTaskEvent;
         void Add(QueueTask item);
         void Clear();
         bool Contains(QueueTask item);
         void CopyTo(QueueTask[] array, int arrayIndex);
-        void DeleteById(int id); 
-        IQueryable<QueueTask> FindBy(Expression<Func<QueueTask, bool>> predicate);
+        void DeleteById(string id);
+        IEnumerable<QueueTask> FindBy(Expression<Func<QueueTask, bool>> predicate);
         QueueTask FirstOrDefault(Expression<Func<QueueTask, bool>> predicate);
         QueueTask Get(QueueTask entity);
         IList<QueueTask> GetAll();
@@ -33,6 +34,6 @@ namespace AbstractQueue.TaskStore
         void SetFailedStatus(QueueTask task);
         void SetSuccessStatus(QueueTask task);
         void Update(QueueTask entity);
-        IQueryable<QueueTask> Where(Expression<Func<QueueTask, bool>> predicate);
+        IEnumerable<QueueTask> Where(Expression<Func<QueueTask, bool>> predicate);
     }
 }
