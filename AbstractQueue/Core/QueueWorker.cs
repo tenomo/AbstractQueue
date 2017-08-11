@@ -1,12 +1,13 @@
 ﻿using System;
 using System.Linq;
 using System.Threading.Tasks;
+using AbstractQueue.Infrastructure;
 using AbstractQueue.QueueData.Entities;
 using AbstractQueue.TaskStore;
 
 namespace AbstractQueue.Core
 {
-   internal class QueueWorker //: ITaskExecutionObserver
+   internal class QueueWorker : IBusy
     {
         /// <summary>
         /// Queue worker Id.
@@ -41,7 +42,7 @@ namespace AbstractQueue.Core
         /// </summary>
         internal TaskStore.TaskStore WorkerTaskStore {   get; private set; }
 
-        internal bool InProccess { get; private set; }
+        public bool InProccess { get; private set; }
 
         /// <summary>
         /// Current queue name
@@ -60,6 +61,11 @@ namespace AbstractQueue.Core
             var taskstore = new TaskStore.TaskStore();
             Infrastructure.TaskExecutionObserver.Kernal.FailedExecuteTaskEvent += ExecutedTaskEvent;
             Infrastructure.TaskExecutionObserver.Kernal.SuccessExecuteTaskEvent += ExecutedTaskEvent;
+            Infrastructure.TaskExecutionObserver.Kernal.SuccessExecuteTaskEvent +=
+                delegate (ITaskStore store, QueueTask task)
+                {
+                    WorkerTaskStore = BuildTaskStore();
+                };
             return taskstore;
         }
             
@@ -138,11 +144,11 @@ namespace AbstractQueue.Core
         }
 
 
-        private void SetStatusBusy()
+        public void SetStatusBusy()
         {
             InProccess = true;
         }
-        private void SetStatusFree()
+        public void SetStatusFree()
         {
             InProccess = false;
         }

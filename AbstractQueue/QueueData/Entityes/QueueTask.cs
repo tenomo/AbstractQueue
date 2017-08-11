@@ -64,5 +64,10 @@ namespace AbstractQueue.QueueData.Entities
                 CreationDate = DateTime.Now,
             };
         }
-    }
+
+      public override string ToString()
+      {
+          return $"{nameof(_attempt)}: {_attempt}, {nameof(Id)}: {Id}, {nameof(TaskIndexInQueue)}: {TaskIndexInQueue}, {nameof(QueueName)}: {QueueName}, {nameof(QueueTaskStatus)}: {QueueTaskStatus}, {nameof(Type)}: {Type}, {nameof(Body)}: {Body}, {nameof(CreationDate)}: {CreationDate}, {nameof(ExecutedDate)}: {ExecutedDate}, {nameof(Attempt)}: {Attempt}";
+      }
+  }
 }

@@ -51,9 +51,9 @@ namespace AbstractQueueUnitTests
             {
                 if (ExecutionTaskCount % 2 == 0)
                 {
-                    throw  new ExecutionEngineException();
-                    ExecutionTaskCount++;
-                }
+                    throw  new Exception();
+                    
+                }ExecutionTaskCount++;
             }
         }
 
@@ -77,7 +77,7 @@ namespace AbstractQueueUnitTests
                 queue.AddTask(QueueTask.Create(0, i.ToString()));
             }
             Thread.Sleep(10000);
-            Assert.AreEqual(itterationCount.ToString(), executer.ExecutionTaskCount);
+            Assert.AreEqual(itterationCount.ToString(), executer.ExecutionTaskCount.ToString());
 
         }
 
@@ -95,18 +95,19 @@ namespace AbstractQueueUnitTests
                 queue.AddTask(QueueTask.Create(0, i.ToString()));
             }
             Thread.Sleep(10000);
-            Assert.AreEqual(itterationCount.ToString(), executer.ExecutionTaskCount);
+            Assert.AreEqual(itterationCount.ToString(), executer.ExecutionTaskCount.ToString());
         }
 
         [TestMethod]
         public void execute_task_4_worker_self_tread_test()
         {
-            int itterationCount = 10;
+            int itterationCount = 40;
             const string queueName = "execute_task_4_worker_test";
             int workerscount = 4;
             var executer = new MockTaskExecuter();
             var queue = QueueFactory.CreateQueue(workerscount, executer, queueName);
 
+            
             for (int i = 1; i <= itterationCount; i++)
             {
                 new TaskFactory().StartNew(() =>
@@ -116,7 +117,7 @@ namespace AbstractQueueUnitTests
 
             }
             Thread.Sleep(10000);
-            Assert.AreEqual(itterationCount.ToString(), executer.ExecutionTaskCount);
+            Assert.AreEqual(itterationCount.ToString(), executer.ExecutionTaskCount.ToString());
         }
 
 

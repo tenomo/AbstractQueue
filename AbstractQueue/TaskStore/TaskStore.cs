@@ -30,13 +30,19 @@ namespace AbstractQueue.TaskStore
             private set { _id = value; }
         }
 
+
+        private DbContextWrapper dbContextWrapper { get; set; }
+
         private QueueDataBaseContext QdbContex
         {
             get
             {
                 if (_qdbContex == null)
-                    _qdbContex = new QueueDataBaseContext(Config.ConnectionStringName);
-             
+                {
+                    dbContextWrapper = DbContextPool.GetFreeDbContext();
+                    _qdbContex = dbContextWrapper.QueueDataBaseContext;
+                }
+
                 return _qdbContex;
             }
             set { _qdbContex = value; }
@@ -45,8 +51,7 @@ namespace AbstractQueue.TaskStore
         private IQueryable<QueueTask> QueueTasks => QdbContex.QueueTasks;
 
         internal TaskStore(string queueName)
-        {
-            _qdbContex = new QueueDataBaseContext(Config.ConnectionStringName);
+        { 
             this.QueueName = queueName;
             Id = Guid.NewGuid().ToString().Substring(0, 10);
 
@@ -67,7 +72,10 @@ namespace AbstractQueue.TaskStore
             }
             catch (Exception e)
             {
-                Logger.Log("Add task"+ e.ToString());
+                string isTaskNull = item == null ? "Task is null" : "Task: " + item.ToString();
+                string isQdbContexNull = item == null ? "DB contex is null" : "";
+                Logger.Log("Exception at add new task: " + e.ToString() + "  " + isTaskNull + "  " + isQdbContexNull);
+                throw e;
             }
 
         }
@@ -108,8 +116,7 @@ namespace AbstractQueue.TaskStore
         {
             task.QueueTaskStatus = QueueTaskStatus.Failed;
             task.ExecutedDate = DateTime.Now;
-            Update(task);
-            //FailedExecuteTaskEvent?.Invoke(task);
+            Update(task); 
             Infrastructure.TaskExecutionObserver.Kernal.OnFailedExecuteTaskEvent(this, task);
         }
 
@@ -117,16 +124,14 @@ namespace AbstractQueue.TaskStore
         {
             task.QueueTaskStatus = QueueTaskStatus.Success;
             task.ExecutedDate = DateTime.Now;
-            Update(task);
-            // SuccessExecuteTaskEvent?.Invoke(task);
+            Update(task); 
             Infrastructure.TaskExecutionObserver.Kernal.OnSuccessExecuteTaskEvent(this, task);
         }
 
         internal void SetProccesStatus(QueueTask task)
         {
             task.QueueTaskStatus = QueueTaskStatus.InProcces;
-            Update(task);
-            //   InProccesTaskEvent?.Invoke(task);
+            Update(task); 
             Infrastructure.TaskExecutionObserver.Kernal.OnInProccesTaskEvent(this, task);
         }
 
@@ -175,8 +180,8 @@ namespace AbstractQueue.TaskStore
             {
                 QdbContex.Database.Connection.Close();
                 QdbContex.Dispose();
-
-                QdbContex = new QueueDataBaseContext();
+                var dbcWrapper = DbContextPool.GetFreeDbContext();
+                QdbContex = dbcWrapper.QueueDataBaseContext;
                 var task = GetById(entity.Id);
                 if (task == null) return;
                 task.QueueTaskStatus = entity.QueueTaskStatus;
@@ -188,6 +193,8 @@ namespace AbstractQueue.TaskStore
                 task.TaskIndexInQueue = entity.TaskIndexInQueue;
                 task.ExecutedDate = entity.ExecutedDate;
                 QdbContex.SaveChanges();
+                DbContextPool.ReturnToPool(dbcWrapper);
+
             }
            
         }
@@ -216,6 +223,10 @@ namespace AbstractQueue.TaskStore
             return QdbContex.QueueTasks.FirstOrDefault(predicate);
         }
 
-
+        ~TaskStore()
+        {
+            DbContextPool.ReturnToPool(dbContextWrapper);
+        }
+        
     }
 }

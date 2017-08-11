@@ -16,10 +16,11 @@
     <DebugSymbols>true</DebugSymbols>
     <DebugType>full</DebugType>
     <Optimize>false</Optimize>
-    <OutputPath>bin\Debug\</OutputPath>
+    <OutputPath>bin\Release\</OutputPath>
     <DefineConstants>DEBUG;TRACE</DefineConstants>
     <ErrorReport>prompt</ErrorReport>
     <WarningLevel>4</WarningLevel>
+    <DocumentationFile>bin\Debug\AbstractQueue.xml</DocumentationFile>
   </PropertyGroup>
   <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Release|AnyCPU' ">
     <DebugType>pdbonly</DebugType>
@@ -28,6 +29,7 @@
     <DefineConstants>TRACE</DefineConstants>
     <ErrorReport>prompt</ErrorReport>
     <WarningLevel>4</WarningLevel>
+    <DocumentationFile>bin\Release\AbstractQueue.xml</DocumentationFile>
   </PropertyGroup>
   <ItemGroup>
     <Reference Include="EntityFramework, Version=6.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089, processorArchitecture=MSIL">
@@ -54,9 +56,11 @@
     <Compile Include="Config.cs" />
     <Compile Include="Core\IQueue.cs" />
     <Compile Include="Core\QueueWorker.cs" />
+    <Compile Include="Infrastructure\IBusy.cs" />
     <Compile Include="Infrastructure\ITaskExecutionObserver.cs" />
     <Compile Include="Infrastructure\TaskExecutionObserver.cs" />
     <Compile Include="Infrastructure\Singleton.cs" />
+    <Compile Include="QueueData\Context\DbContextPool.cs" />
     <Compile Include="QueueData\Context\QueueDataBaseContext.cs" />
     <Compile Include="Core\QueueManager.cs" />
     <Compile Include="Logger.cs" />
@@ -64,6 +68,7 @@
     <Compile Include="Core\QueueTaskStatus.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
     <Compile Include="Core\Queue.cs" />
+    <Compile Include="QueueData\Context\DbContextWrapper.cs" />
     <Compile Include="TaskStore\ITaskStore.cs" />
     <Compile Include="TaskStore\TaskStore.cs" />
     <Compile Include="QueueData\Entityes\QueueTask.cs" />
