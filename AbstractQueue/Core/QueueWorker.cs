@@ -132,7 +132,7 @@ namespace AbstractQueue.Core
                 this.WorkerTaskStore = BuildTaskStore(); // Rebuild task store for new thread. 
                 try
                 {
-                    Logger.Log("Start task");  
+                    //Logger.Log("Start task");  
                     Executer.Execute(currentTask);
                     WorkerTaskStore.SetSuccessStatus(currentTask);
                 }

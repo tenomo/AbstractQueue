@@ -76,7 +76,7 @@ namespace AbstractQueueUnitTests
             {
                 queue.AddTask(QueueTask.Create(0, i.ToString()));
             }
-            Thread.Sleep(10000);
+           Thread.Sleep(3000);
             Assert.AreEqual(itterationCount.ToString(), executer.ExecutionTaskCount.ToString());
 
         }

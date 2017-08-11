@@ -17,6 +17,7 @@ namespace AbstractQueue.QueueData.Context
             if (freeContext == null)
             {
                 pool.Add(new DbContextWrapper());
+                //Logger.Log("New contex");
                 return GetFreeDbContext();
             }
 
@@ -26,6 +27,7 @@ namespace AbstractQueue.QueueData.Context
 
         }
 
+        internal static int PoolSize => pool.Count;
 
         private static void Clear()
         {
@@ -44,11 +46,12 @@ namespace AbstractQueue.QueueData.Context
             
             }
 
-            Logger.Log("Clear pool: deleted: " + freeDbContextWrappers.Count() + " elements");
+            //Logger.Log("Clear pool: deleted: " + freeDbContextWrappers.Count() + " elements");
         }
 
         internal static void ReturnToPool(DbContextWrapper obj)
-        { 
+        {
+            //Logger.Log("Return to pool");
             obj.SetStatusFree();
             Clear();
         }

@@ -10,7 +10,7 @@
 //    {
 //        /// Защищённый конструктор необходим для того, чтобы предотвратить создание экземпляра класса Singleton. 
 //        /// Он будет вызван из закрытого конструктора наследственного класса.
-//        protected Singleton() { Logger.Log(typeof(T).ToString());  }
+//        protected Singleton() { //Logger.Log(typeof(T).ToString());  }
 
 //        /// Фабрика используется для отложенной инициализации экземпляра класса
 //        private sealed class SingletonCreator<S> where S : class

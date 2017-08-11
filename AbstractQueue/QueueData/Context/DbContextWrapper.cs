@@ -14,7 +14,7 @@ namespace AbstractQueue.QueueData.Context
 
        public DbContextWrapper( )
        {
-            QueueDataBaseContext = new QueueDataBaseContext(Config.ConnectionStringName);
+            QueueDataBaseContext = new QueueDataBaseContext( );
             SetStatusFree();
        }
         static object lockeObj = new object();

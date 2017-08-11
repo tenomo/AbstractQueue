@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Linq;
+using System.Net.NetworkInformation;
 using AbstractQueue.Infrastructure;
 using AbstractQueue.QueueData.Entities;
 using AbstractQueue.TaskStore;
@@ -121,7 +122,7 @@ namespace AbstractQueue.Core
         }
 
 
-
+        private static int addCount;
 
         /// <summary>
         /// Add new task to queue
@@ -130,7 +131,9 @@ namespace AbstractQueue.Core
         /// <returns></returns>
         public int AddTask(QueueTask queueTask)
         {
-        
+
+            addCount++;
+             Logger.Log("addCount: # " +addCount);
             queueTask.QueueName = QueueName;
             QueueTaskStore.Add(queueTask);
             TryExecuteTask();

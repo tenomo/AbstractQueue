@@ -37,33 +37,50 @@ namespace AbstractQueue.TaskStore
         {
             get
             {
-                if (_qdbContex == null)
-                {
+                //if (_qdbContex == null)
+                //{
                     dbContextWrapper = DbContextPool.GetFreeDbContext();
                     _qdbContex = dbContextWrapper.QueueDataBaseContext;
-                }
+              //  }
 
-                return _qdbContex;
+              //  return _qdbContex;
+              //Logger.Log("DbContextPool.PoolSize: # "+  DbContextPool.PoolSize);
+                return dbContextWrapper.QueueDataBaseContext;
             }
             
         }
-         
-        private IQueryable<QueueTask> QueueTasks => QdbContex.QueueTasks;
+
+        private IQueryable<QueueTask> QueueTasks
+        {
+            get
+            {
+                var tasks = QdbContex.QueueTasks;
+                DbContextPool.ReturnToPool(dbContextWrapper);
+                return tasks;
+
+            }
+        }
 
 
-        
+
 
         internal TaskStore(string queueName)
         { 
             this.QueueName = queueName;
             Id = Guid.NewGuid().ToString().Substring(0, 10);
-
-
             Infrastructure.TaskExecutionObserver.Kernal.FailedExecuteTaskEvent += TaskStore_SetStatus;
             Infrastructure.TaskExecutionObserver.Kernal.SuccessExecuteTaskEvent += TaskStore_SetStatus;
             Infrastructure.TaskExecutionObserver.Kernal.InProccesTaskEvent += TaskStore_SetStatus;
 
         }
+
+        internal TaskStore()
+        {
+      
+            Id = Guid.NewGuid().ToString().Substring(0, 10);
+        }
+
+
         static object lockObj = new object();
         public void Add(QueueTask item)
         {
@@ -83,7 +100,7 @@ namespace AbstractQueue.TaskStore
             {
                 string isTaskNull = item == null ? "Task is null" : "Task: " + item.ToString();
                 string isQdbContexNull = item == null ? "DB contex is null" : "";
-                Logger.Log("Exception at add new task: " + e.ToString() + "  " + isTaskNull + "  " + isQdbContexNull);
+                //Logger.Log("Exception at add new task: " + e.Message + "  " + isTaskNull + "  " + isQdbContexNull);
                 throw e;
             }
 
@@ -91,8 +108,10 @@ namespace AbstractQueue.TaskStore
 
         public void Clear()
         {
+            
             QdbContex.QueueTasks.ToList().Clear();
             QdbContex.SaveChanges();
+            DbContextPool.ReturnToPool(dbContextWrapper);
         }
 
         
@@ -103,17 +122,18 @@ namespace AbstractQueue.TaskStore
 
         public QueueTask this[int index]
         {
-            get { return QueueTasks.ToList()[index]; }
-            set { QueueTasks.ToList()[index] = value; }
+            get
+            {
+                var res = QueueTasks.ToList()[index];
+                DbContextPool.ReturnToPool(dbContextWrapper);
+                return res;
+            }
+            set { QueueTasks.ToList()[index] = value; DbContextPool.ReturnToPool(dbContextWrapper); }
         }
 
        
 
-        internal TaskStore()
-        {
-            _qdbContex = new QueueDataBaseContext(Config.ConnectionStringName);
-            Id = Guid.NewGuid().ToString().Substring(0, 10);
-        }
+      
 
         private void TaskStore_SetStatus(ITaskStore obj, QueueTask e)
         {
@@ -146,7 +166,9 @@ namespace AbstractQueue.TaskStore
 
         public IList<QueueTask> GetAll()
         {
-            return QdbContex.QueueTasks.ToList();
+            var list = QdbContex.QueueTasks.ToList();
+            DbContextPool.ReturnToPool(dbContextWrapper);
+            return list;
         }
 
        
@@ -154,7 +176,9 @@ namespace AbstractQueue.TaskStore
         
         public QueueTask GetById(string id)
         {
-            return QdbContex.QueueTasks.Find(id);
+            var res = QdbContex.QueueTasks.Find(id);
+            DbContextPool.ReturnToPool(dbContextWrapper);
+            return res;
         }
 
        
@@ -182,20 +206,26 @@ namespace AbstractQueue.TaskStore
         public void DeleteById(string id)
         {
             var task = GetById(id);
-            QdbContex.QueueTasks.Remove(task);
-            QdbContex.SaveChanges();
+            var dbc = QdbContex;
+                dbc.QueueTasks.Remove(task);
+            dbc.SaveChanges();
+            DbContextPool.ReturnToPool(dbContextWrapper);
         }
 
      
 
         public IEnumerable<QueueTask> Where(System.Linq.Expressions.Expression<Func<QueueTask, bool>> predicate)
         {
-            return QdbContex.QueueTasks.Where(predicate).ToList();
+            var res = QdbContex.QueueTasks.Where(predicate).ToList();
+            DbContextPool.ReturnToPool(dbContextWrapper);
+            return res;
         }
 
         public QueueTask FirstOrDefault(System.Linq.Expressions.Expression<Func<QueueTask, bool>> predicate)
         {
-            return QdbContex.QueueTasks.FirstOrDefault(predicate);
+            var res = QdbContex.QueueTasks.FirstOrDefault(predicate);
+          DbContextPool.ReturnToPool( dbContextWrapper);
+            return res;
         }
 
         ~TaskStore()
