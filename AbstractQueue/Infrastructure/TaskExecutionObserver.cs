@@ -5,10 +5,9 @@ using AbstractQueue.TaskStore;
 
 namespace AbstractQueue.Infrastructure
 {    
-  public   class TaskExecutionObserver : ITaskExecutionObserver // Singleton<TaskExecutionObserver>,ITaskExecutionObserver
+  internal   class TaskExecutionObserver : ITaskExecutionObserver // Singleton<TaskExecutionObserver>,ITaskExecutionObserver
     {
- 
-      //  [assembly: InternalsVisibleTo("AbstractQueueUnitTests")]
+  
  
 
         public event Action<ITaskStore, QueueTask  > SuccessExecuteTaskEvent;

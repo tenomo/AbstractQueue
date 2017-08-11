@@ -74,13 +74,13 @@ namespace AbstractQueueUnitTests
             object executedTasksCount = 1;
             const string queueName = "Test_Queue_QM_On_NumberCalculateExecuter_with_2_Workers";
             var queue = QueueFactory.CreateQueue(2, new MockTaskExecuter(), queueName);
-            queue.TaskExecutionEvents.SuccessExecuteTaskEvent += delegate(ITaskStore store, QueueTask task)
-            {
-                System.Diagnostics.Debug.WriteLine("work");
-                int temp = (int)executedTasksCount;
-                temp++;
-                executedTasksCount = temp;
-            };
+            //queue.TaskExecutionEvents.SuccessExecuteTaskEvent += delegate(ITaskStore store, QueueTask task)
+            //{
+            //    System.Diagnostics.Debug.WriteLine("work");
+            //    int temp = (int)executedTasksCount;
+            //    temp++;
+            //    executedTasksCount = temp;
+            //};
             QueueManager.Kernal.RegistrateQueue(queue);
 
             for (int i = 0; i < itterationCount; i++)
@@ -98,10 +98,10 @@ namespace AbstractQueueUnitTests
             int executedTasksCount = 1;
             const string queueName = "Test_Queue_QM_On_NumberCalculateExecuter_with_2_Workers";
             var queue = QueueFactory.CreateQueue(2, new MockTaskExecuter(), queueName);
-            queue.TaskExecutionEvents.SuccessExecuteTaskEvent += delegate (ITaskStore store, QueueTask task)
-            {
-                executedTasksCount++;
-            };
+            //queue.TaskExecutionEvents.SuccessExecuteTaskEvent += delegate (ITaskStore store, QueueTask task)
+            //{
+            //    executedTasksCount++;
+            //};
             QueueManager.Kernal.RegistrateQueue(queue);
 
             for (int i = 0; i < itterationCount; i++)

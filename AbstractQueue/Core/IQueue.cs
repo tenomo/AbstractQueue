@@ -6,8 +6,7 @@ namespace AbstractQueue.Core
     {
         int AttemptMaxCount { get; }
         string QueueName { get; set; }
-        int AddTask(QueueTask queueTask);
-        ITaskExecutionObserver TaskExecutionEvents { get; }
+        int AddTask(QueueTask queueTask); 
 
     }
 }

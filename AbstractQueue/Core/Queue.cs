@@ -2,6 +2,7 @@
 using System.Linq;
 using AbstractQueue.Infrastructure;
 using AbstractQueue.QueueData.Entities;
+using AbstractQueue.TaskStore;
 
 namespace AbstractQueue.Core
 {
@@ -35,13 +36,11 @@ namespace AbstractQueue.Core
 
         private int attemptMaxCount;
 
-        private readonly TaskStore.TaskStore QueueTaskStore;
+        private TaskStore.TaskStore QueueTaskStore { get; set; }
         private AbstractTaskExecuter _executer;
         private string _queueName;
 
-        //public event Action<QueueTask> InProccesTaskEvent;
-        //public event Action<QueueTask> SuccessExecuteTaskEvent;
-        //public event Action<QueueTask> FailedExecuteTaskEvent;
+      
 
         /// <summary>
         /// Current queue name
@@ -94,7 +93,10 @@ namespace AbstractQueue.Core
             attemptMaxCount = 0;
             QueueTaskStore = new TaskStore.TaskStore(QueueName);
             QueueWorkers = BuildWorkers(QueueWorkersCount, Executer, QueueName);
+           
         }
+
+        
 
         internal Queue(int queueWorkersCount, AbstractTaskExecuter executer, string queueName, int attemptMaxCount)
             : this(queueWorkersCount, executer, queueName)
@@ -113,10 +115,7 @@ namespace AbstractQueue.Core
             {
                 workers[i] = new QueueWorker(executer, queueName, attemptMaxCount);
                 var buff = workers[i];
-
-                //buff.SuccessExecuteTaskEvent += OnSuccessExecuteTaskEvent;
-                //buff.InProccesTaskEvent += OnInProccesTaskEvent;
-                //buff.FailedExecuteTaskEvent += OnFailedExecuteTaskEvent;
+                 
             }
             return workers;
         }
@@ -131,6 +130,7 @@ namespace AbstractQueue.Core
         /// <returns></returns>
         public int AddTask(QueueTask queueTask)
         {
+            QueueTaskStore = new TaskStore.TaskStore(QueueName);
             queueTask.QueueName = QueueName;
             QueueTaskStore.Add(queueTask);
             TryExecuteTask();
@@ -148,28 +148,12 @@ namespace AbstractQueue.Core
         {
             var worker = QueueWorkers.FirstOrDefault(each => each.InProccess == false);
             return worker;
+
         }
 
-        public ITaskExecutionObserver TaskExecutionEvents => Infrastructure.TaskExecutionObserver.Kernal;
+     
 
 
-        //private void OnInProccesTaskEvent(QueueTask obj)
-        //{
-        //    InProccesTaskEvent?.Invoke(obj);
-        //}
-
-        //private void OnSuccessExecuteTaskEvent(QueueTask obj)
-        //{
-        //    SuccessExecuteTaskEvent?.Invoke(obj);
-        //}
-
-        ///// <summary>
-        ///// 
-        ///// </summary>
-        ///// <param name="obj"></param>
-        //private void OnFailedExecuteTaskEvent(QueueTask obj)
-        //{
-        //    FailedExecuteTaskEvent?.Invoke(obj);
-        //}
+        
     }
 }

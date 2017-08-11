@@ -24,8 +24,8 @@ namespace AbstractQueue.TaskStore
         void Clear();
         bool Contains(QueueTask item);
         void CopyTo(QueueTask[] array, int arrayIndex);
-        void DeleteById(int id); 
-        IQueryable<QueueTask> FindBy(Expression<Func<QueueTask, bool>> predicate);
+        void DeleteById(string id);
+        IEnumerable<QueueTask> FindBy(Expression<Func<QueueTask, bool>> predicate);
         QueueTask FirstOrDefault(Expression<Func<QueueTask, bool>> predicate);
         QueueTask Get(QueueTask entity);
         IList<QueueTask> GetAll();
@@ -34,6 +34,6 @@ namespace AbstractQueue.TaskStore
         void SetFailedStatus(QueueTask task);
         void SetSuccessStatus(QueueTask task);
         void Update(QueueTask entity);
-        IQueryable<QueueTask> Where(Expression<Func<QueueTask, bool>> predicate);
+        IEnumerable<QueueTask> Where(Expression<Func<QueueTask, bool>> predicate);
     }
 }
