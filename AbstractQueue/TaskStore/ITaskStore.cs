@@ -25,7 +25,7 @@ namespace AbstractQueue.TaskStore
         IEnumerable<QueueTask> FindBy(Expression<Func<QueueTask, bool>> predicate);
          QueueTask FirstOrDefault(Expression<Func<QueueTask, bool>> predicate);
         QueueTask Get(QueueTask entity);
-         IList<QueueTask> GetAll();
+        IQueryable<QueueTask> GetAll();
         QueueTask GetById(int id);
         int IndexOf(QueueTask item);
         void SetFailedStatus(QueueTask task);

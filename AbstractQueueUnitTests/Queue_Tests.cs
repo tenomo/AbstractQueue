@@ -96,7 +96,7 @@ namespace AbstractQueueUnitTests
             Thread.Sleep(10000);
             Assert.AreEqual(itterationCount.ToString(), executer.ExecutionTaskCount.ToString());
         }
-
+        Random rnd = new Random();
         [TestMethod]
         public void execute_task_4_worker_self_tread_test()
         {
@@ -112,7 +112,11 @@ namespace AbstractQueueUnitTests
                 {
                     queue.AddTask(QueueTask.Create(0, i.ToString()));
                 });
-
+                var a = rnd.Next(1, 31);
+                if (a  % 2 == 0)
+                {
+                    Thread.Sleep(100);
+                }
             }
             Thread.Sleep(10000);
             Assert.AreEqual(itterationCount.ToString(), executer.ExecutionTaskCount.ToString());

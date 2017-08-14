@@ -26,13 +26,13 @@ namespace AbstractQueue.Core
             private set
             {
                 if (value > 1)
-                    isTryHandleError = true;
+                    this.isTryHandleError = true;
                 else if (value < 0)
                 {
                     throw new ArgumentException("AttemptMaxCount must be more 0");
                 }
 
-                attemptMaxCount = value;
+                this.attemptMaxCount = value;
             }
         }
 
@@ -60,22 +60,22 @@ namespace AbstractQueue.Core
             var taskstore = new TaskStore.TaskStore();
             Infrastructure.TaskExecutionObserver.Kernal.FailedExecuteTaskEvent += ExecutedTaskEvent;
             Infrastructure.TaskExecutionObserver.Kernal.SuccessExecuteTaskEvent += ExecutedTaskEvent;
-            Infrastructure.TaskExecutionObserver.Kernal.InProccesTaskEvent += delegate(ITaskStore store, QueueTask task)
-            {
-                this.WorkerTaskStore = BuildTaskStore();
-            };
+            //Infrastructure.TaskExecutionObserver.Kernal.InProccesTaskEvent += delegate (ITaskStore store, QueueTask task)
+            //{
+            //    this.WorkerTaskStore = BuildTaskStore();
+            //};
             return taskstore;
         }
-            
+
 
         public QueueWorker(AbstractTaskExecuter executer, string queueName, int attemptMaxCount = 0)
         {
             this.WorkerTaskStore = BuildTaskStore();
-          this.TryStartTask();
+            this.TryStartTask();
             this.Executer = executer;
             this.AttemptMaxCount = attemptMaxCount;
             this.queueName = queueName;
-            SetStatusFree();
+            this.SetStatusFree();
         }
 
         internal int CountHandleFailed
@@ -84,12 +84,12 @@ namespace AbstractQueue.Core
             private set
             {
                 if (value > 1)
-                    isTryHandleError = true;
+                    this.isTryHandleError = true;
                 else if (value < 0)
                 {
                     throw new ArgumentException("AttemptMaxCount must be more 0");
                 }
-                attemptMaxCount = value;
+                this.attemptMaxCount = value;
             }
         }
 
@@ -98,10 +98,10 @@ namespace AbstractQueue.Core
         /// Executed queueTask handler.
         /// </summary>
         /// <param name="queueTask"></param>
-        private void ExecutedTaskEvent(ITaskStore obj ,QueueTask e)
+        private void ExecutedTaskEvent(ITaskStore obj, QueueTask e)
         {
-            if (obj.Id == this.WorkerTaskStore.Id  )
-            {  
+            if (obj.Id == this.WorkerTaskStore.Id)
+            {
                 SetStatusFree();
                 TryStartNextTask();
             }
@@ -117,20 +117,16 @@ namespace AbstractQueue.Core
             if (!isCan)
             {
                 SetStatusFree();
-                return;
             }
             else
             {
-
-                SetStatusBusy();
+                this.SetStatusBusy();
                 UpExecutionAttempt(currentTask);
                 WorkerTaskStore.SetProccesStatus(currentTask);
-
-                new TaskFactory().StartNew(() =>
+             var executeThTask =   new TaskFactory().StartNew(() =>
                 {
                     try
                     {
-                        Logger.Log("Start task");
                         Executer.Execute(currentTask);
                         WorkerTaskStore.SetSuccessStatus(currentTask);
                     }
@@ -139,6 +135,7 @@ namespace AbstractQueue.Core
                         WorkerTaskStore.SetFailedStatus(currentTask);
                     }
                 });
+                executeThTask.Wait();
             }
 
         }
@@ -148,13 +145,10 @@ namespace AbstractQueue.Core
         /// </summary>
         private void TryStartNextTask()
         {
-              this.WorkerTaskStore = BuildTaskStore();
+            //this.WorkerTaskStore = BuildTaskStore();
             var isCan = IsCanExecuteTask();
             if (!isCan)
-            {
                 SetStatusFree();
-                return;
-            }
             else
             {
                 SetStatusBusy();
@@ -182,10 +176,6 @@ namespace AbstractQueue.Core
             InProccess = false;
         }
 
- 
-       
-
-
         /// <summary>
         /// Check executeble queueTask and return boolean value and queueTask workerId.
         /// </summary>
@@ -193,8 +183,9 @@ namespace AbstractQueue.Core
         /// <param name="index"></param>
         private bool IsCanExecuteTask()
         {
-           var task = WorkerTaskStore.GetAll().FirstOrDefault(each => CheckStatus(each)  && each.QueueName == queueName ); 
-             
+            var tasks = WorkerTaskStore.Where(each=>each.QueueName == queueName && each.QueueTaskStatus == QueueTaskStatus.Created || each.QueueTaskStatus == QueueTaskStatus.Failed);
+            var task = tasks.ToList().FirstOrDefault(each => CheckStatus(each) && each.QueueName == queueName);
+
             var isCan = task != null;
 
             if (isCan)

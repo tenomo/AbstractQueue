@@ -1,6 +1,5 @@
 ﻿using System;
 using System.Collections.Generic;
-using System.Data;
 using System.Linq;
 using AbstractQueue.Core;
 using AbstractQueue.QueueData.Context;
@@ -41,7 +40,7 @@ namespace AbstractQueue.TaskStore
             set { _qdbContex = value; }
         }
 
-        private IQueryable<QueueTask> QueueTasks => QdbContex.QueueTasks;
+        
 
         internal TaskStore(string queueName)
         {
@@ -97,16 +96,16 @@ namespace AbstractQueue.TaskStore
             QdbContex.SaveChanges();
         }
 
-        public bool Contains(QueueTask item) => QueueTasks.Contains(item);
-        public void CopyTo(QueueTask[] array, int arrayIndex) => QueueTasks.ToList().CopyTo(array, arrayIndex);
-        public int Count => QueueTasks.ToList().Count;
+        public bool Contains(QueueTask item) => QdbContex.QueueTasks.Contains(item);
+        public void CopyTo(QueueTask[] array, int arrayIndex) => QdbContex.QueueTasks.ToList().CopyTo(array, arrayIndex);
+        public int Count => QdbContex.QueueTasks.ToList().Count;
         public bool IsReadOnly => false;
-        public int IndexOf(QueueTask item) => QueueTasks.ToList().IndexOf(item);
+        public int IndexOf(QueueTask item) => QdbContex.QueueTasks.ToList().IndexOf(item);
 
         public QueueTask this[int index]
         {
-            get { return QueueTasks.ToList()[index]; }
-            set { QueueTasks.ToList()[index] = value; }
+            get { return QdbContex.QueueTasks.ToList()[index]; }
+            set { QdbContex.QueueTasks.ToList()[index] = value; }
         }
 
 
@@ -146,9 +145,9 @@ namespace AbstractQueue.TaskStore
             Infrastructure.TaskExecutionObserver.Kernal.OnInProccesTaskEvent(this, task);
         }
 
-        public   IList<QueueTask> GetAll()
+        public   IQueryable<QueueTask> GetAll()
         {
-            return QdbContex.QueueTasks.ToList();
+            return QdbContex.QueueTasks;
         }
 
         public  QueueTask GetById(int id)

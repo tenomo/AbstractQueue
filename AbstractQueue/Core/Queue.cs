@@ -96,8 +96,6 @@ namespace AbstractQueue.Core
            
         }
 
-        
-
         internal Queue(int queueWorkersCount, AbstractTaskExecuter executer, string queueName, int attemptMaxCount)
             : this(queueWorkersCount, executer, queueName)
         {
@@ -120,7 +118,7 @@ namespace AbstractQueue.Core
             return workers;
         }
 
-
+        static object obj = new object();
         /// <summary>
         /// Add new task to queue
         /// </summary>
@@ -128,13 +126,15 @@ namespace AbstractQueue.Core
         /// <returns></returns>
         public int AddTask(QueueTask queueTask)
         {
-          //  QueueTaskStore = new TaskStore.TaskStore(QueueName);
-            queueTask.QueueName = QueueName;
+            lock (obj)
+            {
+                         queueTask.QueueName = QueueName;
             QueueTaskStore.Add(queueTask);
             TryExecuteTask();
             return QueueTaskStore.IndexOf(queueTask);
+            }
+   
         }
-
 
         private void TryExecuteTask()
         {
