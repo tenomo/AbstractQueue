@@ -97,7 +97,7 @@ namespace AbstractQueue.Core
         private void ExecutedTaskEvent(ITaskStore obj ,QueueTask e)
         {
             if (obj.Id == this.WorkerTaskStore.Id)
-            { 
+            {  
                 SetStatusFree();
                 TryStartNextTask();
             }
@@ -118,12 +118,12 @@ namespace AbstractQueue.Core
             
             SetStatusBusy();
 
-            UpAttempt(currentTask);
+            UpExecutionAttempt(currentTask);
             WorkerTaskStore.SetProccesStatus(currentTask);
 
-            new TaskFactory().StartNew(() =>
+          var workerTask =  new TaskFactory().StartNew(() =>
             {
-                this.WorkerTaskStore = BuildTaskStore(); // Rebuild task store for new thread. 
+              //  this.WorkerTaskStore = BuildTaskStore(); // Rebuild task store for new thread. 
                 try
                 {
                     Logger.Log("Start task");  
@@ -135,6 +135,7 @@ namespace AbstractQueue.Core
                     WorkerTaskStore.SetFailedStatus(currentTask);
                 }
             });
+            //workerTask.Wait();
         }
 
 
@@ -151,7 +152,7 @@ namespace AbstractQueue.Core
         /// </summary>
         private void TryStartNextTask()
         {
-            this.WorkerTaskStore = BuildTaskStore();
+           // this.WorkerTaskStore = BuildTaskStore();
             var isCan = IsCanExecuteTask();
             if (!isCan)
             { 
@@ -160,7 +161,7 @@ namespace AbstractQueue.Core
                 return;
             }
             SetStatusBusy();
-            UpAttempt(currentTask);
+            UpExecutionAttempt(currentTask);
             WorkerTaskStore.SetProccesStatus(currentTask);
             try
             { 
@@ -245,7 +246,7 @@ namespace AbstractQueue.Core
         /// Iterate the execution task attempt. 
         /// </summary>
         /// <param name="task"></param>
-        private void UpAttempt(QueueTask task)
+        private void UpExecutionAttempt(QueueTask task)
         {
             task.Attempt++;
             WorkerTaskStore.Update(task);

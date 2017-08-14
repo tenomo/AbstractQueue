@@ -121,8 +121,6 @@ namespace AbstractQueue.Core
         }
 
 
-
-
         /// <summary>
         /// Add new task to queue
         /// </summary>
@@ -130,7 +128,7 @@ namespace AbstractQueue.Core
         /// <returns></returns>
         public int AddTask(QueueTask queueTask)
         {
-            QueueTaskStore = new TaskStore.TaskStore(QueueName);
+          //  QueueTaskStore = new TaskStore.TaskStore(QueueName);
             queueTask.QueueName = QueueName;
             QueueTaskStore.Add(queueTask);
             TryExecuteTask();

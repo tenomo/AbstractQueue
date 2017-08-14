@@ -1,9 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Linq;
-using System.Runtime.InteropServices;
 using AbstractQueue.Core;
-using AbstractQueue.Infrastructure;
 using AbstractQueue.QueueData.Context;
 using AbstractQueue.QueueData.Entities;
 
@@ -14,7 +12,8 @@ namespace AbstractQueue.TaskStore
     /// </summary>
     internal sealed class TaskStore : ITaskStore //, ITaskExecutionObserver
     {
-        private QueueDataBaseContext _qdbContex;
+        [ThreadStatic]
+        private static QueueDataBaseContext _qdbContex;
         private string _id;
         private string queueName;
 
@@ -36,7 +35,6 @@ namespace AbstractQueue.TaskStore
             {
                 if (_qdbContex == null)
                     _qdbContex = new QueueDataBaseContext(Config.ConnectionStringName);
-             
                 return _qdbContex;
             }
             set { _qdbContex = value; }
@@ -62,8 +60,7 @@ namespace AbstractQueue.TaskStore
             try
             {
                 QdbContex.QueueTasks.Add(item);
-                QdbContex.SaveChanges();
-                QdbContex.Database.Connection.Close();
+                QdbContex.SaveChanges(); 
             }
             catch (Exception e)
             {
@@ -94,7 +91,7 @@ namespace AbstractQueue.TaskStore
 
         internal TaskStore()
         {
-            _qdbContex = new QueueDataBaseContext(Config.ConnectionStringName);
+            
             Id = Guid.NewGuid().ToString().Substring(0, 10);
         }
 
@@ -108,8 +105,7 @@ namespace AbstractQueue.TaskStore
         {
             task.QueueTaskStatus = QueueTaskStatus.Failed;
             task.ExecutedDate = DateTime.Now;
-            Update(task);
-            //FailedExecuteTaskEvent?.Invoke(task);
+            Update(task); 
             Infrastructure.TaskExecutionObserver.Kernal.OnFailedExecuteTaskEvent(this, task);
         }
 
@@ -117,16 +113,14 @@ namespace AbstractQueue.TaskStore
         {
             task.QueueTaskStatus = QueueTaskStatus.Success;
             task.ExecutedDate = DateTime.Now;
-            Update(task);
-            // SuccessExecuteTaskEvent?.Invoke(task);
+            Update(task); 
             Infrastructure.TaskExecutionObserver.Kernal.OnSuccessExecuteTaskEvent(this, task);
         }
 
         internal void SetProccesStatus(QueueTask task)
         {
             task.QueueTaskStatus = QueueTaskStatus.InProcces;
-            Update(task);
-            //   InProccesTaskEvent?.Invoke(task);
+            Update(task); 
             Infrastructure.TaskExecutionObserver.Kernal.OnInProccesTaskEvent(this, task);
         }
 
@@ -157,8 +151,8 @@ namespace AbstractQueue.TaskStore
 
         public void Update (QueueTask entity)
         {
-            try
-            {
+            //try
+            //{
                 var task = GetById(entity.Id);
                 if (task == null) return;
                 task.QueueTaskStatus = entity.QueueTaskStatus;
@@ -169,26 +163,24 @@ namespace AbstractQueue.TaskStore
                 task.QueueName = entity.QueueName;
                 task.TaskIndexInQueue = entity.TaskIndexInQueue;
                 task.ExecutedDate = entity.ExecutedDate;
-                QdbContex.SaveChanges();
-            }
-            catch (Exception e)
-            {
-                QdbContex.Database.Connection.Close();
-                QdbContex.Dispose();
+                QdbContex.SaveChanges(); 
+            //}
+            //catch (Exception e)
+            //{ 
 
-                QdbContex = new QueueDataBaseContext();
-                var task = GetById(entity.Id);
-                if (task == null) return;
-                task.QueueTaskStatus = entity.QueueTaskStatus;
-                task.Body = entity.Body;
-                task.Type = entity.Type;
-                task.Attempt = entity.Attempt;
-                task.CreationDate = entity.CreationDate;
-                task.QueueName = entity.QueueName;
-                task.TaskIndexInQueue = entity.TaskIndexInQueue;
-                task.ExecutedDate = entity.ExecutedDate;
-                QdbContex.SaveChanges();
-            }
+            //    QdbContex = new QueueDataBaseContext();
+            //    var task = GetById(entity.Id);
+            //    if (task == null) return;
+            //    task.QueueTaskStatus = entity.QueueTaskStatus;
+            //    task.Body = entity.Body;
+            //    task.Type = entity.Type;
+            //    task.Attempt = entity.Attempt;
+            //    task.CreationDate = entity.CreationDate;
+            //    task.QueueName = entity.QueueName;
+            //    task.TaskIndexInQueue = entity.TaskIndexInQueue;
+            //    task.ExecutedDate = entity.ExecutedDate;
+            //    QdbContex.SaveChanges();
+            //}
            
         }
 

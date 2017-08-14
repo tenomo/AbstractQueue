@@ -1,8 +1,7 @@
-﻿using AbstractQueue.Infrastructure;
-using AbstractQueue.QueueData.Entities;
+﻿ using AbstractQueue.QueueData.Entities;
 namespace AbstractQueue.Core
 {
-    public  interface IQueue  // :   ITaskExecutionObserver
+    public  interface IQueue  
     {
         int AttemptMaxCount { get; }
         string QueueName { get; set; }

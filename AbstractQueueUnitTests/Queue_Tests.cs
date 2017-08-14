@@ -59,7 +59,7 @@ namespace AbstractQueueUnitTests
 
         public Queue_Tests()
         {
-
+            
         }
 
 
@@ -77,7 +77,7 @@ namespace AbstractQueueUnitTests
                 queue.AddTask(QueueTask.Create(0, i.ToString()));
             }
             Thread.Sleep(10000);
-            Assert.AreEqual(itterationCount.ToString(), executer.ExecutionTaskCount);
+            Assert.AreEqual(itterationCount.ToString(), executer.ExecutionTaskCount.ToString());
 
         }
 
@@ -95,7 +95,7 @@ namespace AbstractQueueUnitTests
                 queue.AddTask(QueueTask.Create(0, i.ToString()));
             }
             Thread.Sleep(10000);
-            Assert.AreEqual(itterationCount.ToString(), executer.ExecutionTaskCount);
+            Assert.AreEqual(itterationCount.ToString(), executer.ExecutionTaskCount.ToString());
         }
 
         [TestMethod]
@@ -116,7 +116,7 @@ namespace AbstractQueueUnitTests
 
             }
             Thread.Sleep(10000);
-            Assert.AreEqual(itterationCount.ToString(), executer.ExecutionTaskCount);
+            Assert.AreEqual(itterationCount.ToString(), executer.ExecutionTaskCount.ToString());
         }
 
 
