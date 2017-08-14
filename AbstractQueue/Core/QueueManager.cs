@@ -12,8 +12,8 @@ namespace AbstractQueue.Core
     {
         private ITaskStore taslStore;
         private Timer timer;
-        /// защищённый конструктор нужен, чтобы предотвратить создание экземпляра класса Singleton
-        protected QueueManager() // : base()
+     
+        private QueueManager()  
         {
             queues = new Dictionary<string, IQueue>();
             taslStore = new TaskStore.TaskStore();
@@ -25,7 +25,8 @@ namespace AbstractQueue.Core
 
         private void TaskCleaner(object sender, ElapsedEventArgs e)
         {
-          var tasks =   taslStore.Where(each=>each.QueueTaskStatus == QueueTaskStatus.Created ||  each.QueueTaskStatus == QueueTaskStatus.Failed).ToList();
+         var tasks =   taslStore.Where(each=>each.QueueTaskStatus == QueueTaskStatus.Created ||  each.QueueTaskStatus == QueueTaskStatus.Failed).ToList();
+ 
 
             tasks.ForEach(delegate(QueueTask task)
             {

@@ -1,11 +1,8 @@
 ﻿using System;
 using System.Threading;
 using System.Threading.Tasks;
-using AbstractQueue;
 using AbstractQueue.Core;
-using AbstractQueue.Infrastructure;
 using AbstractQueue.QueueData.Entities;
-using AbstractQueue.TaskStore;
 using Microsoft.VisualStudio.TestTools.UnitTesting;
 
 namespace AbstractQueueUnitTests
@@ -15,32 +12,34 @@ namespace AbstractQueueUnitTests
     {
         class MockTaskExecuter : AbstractTaskExecuter
         {
-            private int _executionTaskCount;
+            private int _executionTaskCount = 0;
             private object lockObj = new object();
+
             public int ExecutionTaskCount
             {
                 get
                 {
                     lock (lockObj)
                     {
-                            return  _executionTaskCount;
+                        return _executionTaskCount;
                     }
-                
                 }
                 set
                 {
                     lock (lockObj)
-                    {       _executionTaskCount = value;
-                        
+                    {
+                        _executionTaskCount = value;
+
                     }
-             
+
                 }
             }
 
             public override void Execute(QueueTask queueTask)
             {
-              
-                ExecutionTaskCount++;
+                
+
+                   ExecutionTaskCount++;
             }
         }
         class MockErorrTaskExecuter : AbstractTaskExecuter

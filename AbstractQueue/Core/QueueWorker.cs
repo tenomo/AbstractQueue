@@ -60,6 +60,10 @@ namespace AbstractQueue.Core
             var taskstore = new TaskStore.TaskStore();
             Infrastructure.TaskExecutionObserver.Kernal.FailedExecuteTaskEvent += ExecutedTaskEvent;
             Infrastructure.TaskExecutionObserver.Kernal.SuccessExecuteTaskEvent += ExecutedTaskEvent;
+            Infrastructure.TaskExecutionObserver.Kernal.InProccesTaskEvent += delegate(ITaskStore store, QueueTask task)
+            {
+                this.WorkerTaskStore = BuildTaskStore();
+            };
             return taskstore;
         }
             
@@ -96,7 +100,7 @@ namespace AbstractQueue.Core
         /// <param name="queueTask"></param>
         private void ExecutedTaskEvent(ITaskStore obj ,QueueTask e)
         {
-            if (obj.Id == this.WorkerTaskStore.Id)
+            if (obj.Id == this.WorkerTaskStore.Id  )
             {  
                 SetStatusFree();
                 TryStartNextTask();
@@ -111,22 +115,53 @@ namespace AbstractQueue.Core
         { 
             var isCan =     IsCanExecuteTask( );
             if (!isCan)
-            { 
+            {
                 SetStatusFree();
                 return;
             }
-            
-            SetStatusBusy();
-
-            UpExecutionAttempt(currentTask);
-            WorkerTaskStore.SetProccesStatus(currentTask);
-
-          var workerTask =  new TaskFactory().StartNew(() =>
+            else
             {
-              //  this.WorkerTaskStore = BuildTaskStore(); // Rebuild task store for new thread. 
+
+                SetStatusBusy();
+                UpExecutionAttempt(currentTask);
+                WorkerTaskStore.SetProccesStatus(currentTask);
+
+                new TaskFactory().StartNew(() =>
+                {
+                    try
+                    {
+                        Logger.Log("Start task");
+                        Executer.Execute(currentTask);
+                        WorkerTaskStore.SetSuccessStatus(currentTask);
+                    }
+                    catch
+                    {
+                        WorkerTaskStore.SetFailedStatus(currentTask);
+                    }
+                });
+            }
+
+        }
+
+        /// <summary>
+        /// Try execute task.
+        /// </summary>
+        private void TryStartNextTask()
+        {
+              this.WorkerTaskStore = BuildTaskStore();
+            var isCan = IsCanExecuteTask();
+            if (!isCan)
+            {
+                SetStatusFree();
+                return;
+            }
+            else
+            {
+                SetStatusBusy();
+                UpExecutionAttempt(currentTask);
+                WorkerTaskStore.SetProccesStatus(currentTask);
                 try
                 {
-                    Logger.Log("Start task");  
                     Executer.Execute(currentTask);
                     WorkerTaskStore.SetSuccessStatus(currentTask);
                 }
@@ -134,8 +169,7 @@ namespace AbstractQueue.Core
                 {
                     WorkerTaskStore.SetFailedStatus(currentTask);
                 }
-            });
-            //workerTask.Wait();
+            }
         }
 
 
@@ -147,32 +181,9 @@ namespace AbstractQueue.Core
         {
             InProccess = false;
         }
-        /// <summary>
-        /// Try execute task.
-        /// </summary>
-        private void TryStartNextTask()
-        {
-           // this.WorkerTaskStore = BuildTaskStore();
-            var isCan = IsCanExecuteTask();
-            if (!isCan)
-            { 
-                Executer.Execute(currentTask);
-                SetStatusFree();
-                return;
-            }
-            SetStatusBusy();
-            UpExecutionAttempt(currentTask);
-            WorkerTaskStore.SetProccesStatus(currentTask);
-            try
-            { 
-                Executer.Execute(currentTask);
-                WorkerTaskStore.SetSuccessStatus(currentTask);
-            }
-            catch
-            {
-                WorkerTaskStore.SetFailedStatus(currentTask);
-            }
-        }
+
+ 
+       
 
 
         /// <summary>
@@ -182,7 +193,8 @@ namespace AbstractQueue.Core
         /// <param name="index"></param>
         private bool IsCanExecuteTask()
         {
-            var task = WorkerTaskStore.GetAll().FirstOrDefault(each => CheckStatus(each)  && each.QueueName == queueName ); 
+           var task = WorkerTaskStore.GetAll().FirstOrDefault(each => CheckStatus(each)  && each.QueueName == queueName ); 
+             
             var isCan = task != null;
 
             if (isCan)
@@ -193,10 +205,8 @@ namespace AbstractQueue.Core
                     currentTask = task;
                     currentTask.TaskIndexInQueue = this.Id;
                     WorkerTaskStore.Update(currentTask);
-
                     return isCan;
                 }
-
                 else
                 {
                     currentTask = null;
@@ -220,6 +230,7 @@ namespace AbstractQueue.Core
         {
             
             var _isHandleFailed = this.isTryHandleError;
+
             if (_isHandleFailed)
             {
 
@@ -237,9 +248,15 @@ namespace AbstractQueue.Core
         private bool CheckOnAttemptLimit(QueueTask task)
         {
             var countHandleFailed = CountHandleFailed;
-            if (task == null || isTryHandleError == false)
+            if (task == null)
+                return false;
+            if (isTryHandleError   && task.QueueTaskStatus == QueueTaskStatus.Failed &&
+                task.Attempt <= countHandleFailed)
                 return true;
-            return task.QueueTaskStatus == QueueTaskStatus.Failed && task.Attempt <= countHandleFailed;
+
+            return   task.QueueTaskStatus == QueueTaskStatus.Created;
+
+
         }
 
         /// <summary>
