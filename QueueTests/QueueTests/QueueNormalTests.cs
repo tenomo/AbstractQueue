@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Threading;
 using System.Threading.Tasks;
+using AbstractQueue;
 using AbstractQueue.Core;
 using AbstractQueue.QueueData.Entities;
 using AbstractQueueUnitTests.Mock; 
@@ -17,7 +18,9 @@ namespace AbstractQueueUnitTests.QueueTests
 
         public QueueNormalTests()
         {
-
+            Config.IsConnectionName = false;
+            Config.ConnectionStringName =
+                System.Configuration.ConfigurationManager.ConnectionStrings["DefaultConnection"].ConnectionString;
         }
 
         private void WaitTast(int timeout)

@@ -9,5 +9,6 @@ namespace AbstractQueue
   public  class Config
     {
         public static string ConnectionStringName { get; set; }  = "DefaultConnection";
+        public static bool IsConnectionName { get; set; } = true;
     }
 }

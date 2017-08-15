@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Threading;
 using System.Threading.Tasks;
+using AbstractQueue;
 using AbstractQueue.Core;
 using AbstractQueue.QueueData.Entities;
 using AbstractQueueUnitTests.Mock; 
@@ -11,6 +12,13 @@ namespace AbstractQueueUnitTests.QueueTests
     [TestFixture]
     public class QueueMultitradsCallsTests
     {
+
+        public QueueMultitradsCallsTests()
+        {
+            Config.IsConnectionName = false;
+            Config.ConnectionStringName =
+                System.Configuration.ConfigurationManager.ConnectionStrings["DefaultConnection"].ConnectionString;
+        }
         private void WaitTast(int timeout)
         {
             Thread.Sleep(timeout);
@@ -85,10 +93,10 @@ namespace AbstractQueueUnitTests.QueueTests
                 var a = rnd.Next(1, 31);
                 if (a % 2 == 0)
                 {
-                    WaitTast(100);
+                    WaitTast(2);
                 }
             }
-            WaitTast(100);
+            WaitTast(10000);
             Assert.AreEqual(itterationCount.ToString(), executer.ExecutionTaskCount.ToString());
         }
 

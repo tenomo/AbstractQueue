@@ -34,7 +34,7 @@ namespace AbstractQueue.TaskStore
             get
             {
                 if (_qdbContex == null)
-                    _qdbContex = new QueueDataBaseContext(Config.ConnectionStringName);
+                    _qdbContex = new QueueDataBaseContext(Config.ConnectionStringName, Config.IsConnectionName);
                 return _qdbContex;
             }
             set { _qdbContex = value; }
@@ -44,7 +44,7 @@ namespace AbstractQueue.TaskStore
 
         internal TaskStore(string queueName)
         {
-            _qdbContex = new QueueDataBaseContext(Config.ConnectionStringName);
+            _qdbContex = new QueueDataBaseContext(Config.ConnectionStringName, Config.IsConnectionName);
             this.QueueName = queueName;
             Id = Guid.NewGuid().ToString().Substring(0, 10);
 
