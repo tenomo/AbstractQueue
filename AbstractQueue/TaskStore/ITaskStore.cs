@@ -31,7 +31,7 @@ namespace AbstractQueue.TaskStore
         void SetFailedStatus(QueueTask task);
         void SetSuccessStatus(QueueTask task);
         void Update(QueueTask entity);
-        IEnumerable<QueueTask> Where(Expression<Func<QueueTask, bool>> predicate);
+        IQueryable<QueueTask> Where(Expression<Func<QueueTask, bool>> predicate);
   
     }
 }

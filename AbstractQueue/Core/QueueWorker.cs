@@ -40,14 +40,33 @@ namespace AbstractQueue.Core
         /// QueueTasks WorkerTaskStore.
         /// </summary>
         internal TaskStore.TaskStore WorkerTaskStore {   get; private set; }
+        static object lockObject = new object();
+        internal bool InProccess
+        {
+            get
+            {
+                lock (lockObject)
+                {
+                    return _inProccess;
+                }
 
-        internal bool InProccess { get; private set; }
+            }
+            private set
+            {
+                lock (lockObject)
+                {
+                    _inProccess = value;
+                }
+
+            }
+        }
 
         /// <summary>
         /// Current queue name
         /// </summary>
         private readonly string queueName;
         private QueueTask currentTask;
+        private bool _inProccess;
 
         internal QueueTask CurrentTask
         {
@@ -60,10 +79,6 @@ namespace AbstractQueue.Core
             var taskstore = new TaskStore.TaskStore();
             Infrastructure.TaskExecutionObserver.Kernal.FailedExecuteTaskEvent += ExecutedTaskEvent;
             Infrastructure.TaskExecutionObserver.Kernal.SuccessExecuteTaskEvent += ExecutedTaskEvent;
-            //Infrastructure.TaskExecutionObserver.Kernal.InProccesTaskEvent += delegate (ITaskStore store, QueueTask task)
-            //{
-            //    this.WorkerTaskStore = BuildTaskStore();
-            //};
             return taskstore;
         }
 
@@ -145,7 +160,6 @@ namespace AbstractQueue.Core
         /// </summary>
         private void TryStartNextTask()
         {
-            //this.WorkerTaskStore = BuildTaskStore();
             var isCan = IsCanExecuteTask();
             if (!isCan)
                 SetStatusFree();

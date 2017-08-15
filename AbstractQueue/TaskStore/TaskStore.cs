@@ -56,38 +56,29 @@ namespace AbstractQueue.TaskStore
         }
 
         public void Add(QueueTask item)
-        {
-            try
-            {
+        { 
            
-                using (var transaction = QdbContex.Database.BeginTransaction(System.Data.IsolationLevel.RepeatableRead  ))
-                {
+              //  using (var transaction = QdbContex.Database.BeginTransaction(System.Data.IsolationLevel.RepeatableRead  ))
+              //  {
                     QdbContex.QueueTasks.Add(item);
                     QdbContex.SaveChanges();
-                    transaction.Commit();
-                }
-            }
-            catch (Exception e)
-            {
-                Logger.Log("Add task" + e.ToString());
-            }
-
+                  //  transaction.Commit();
+                //}
         }
 
 
         public void Update(QueueTask entity)
         { 
-            using (var transaction = QdbContex.Database.BeginTransaction(System.Data.IsolationLevel.RepeatableRead  ))
-            {
+            //using (var transaction = QdbContex.Database.BeginTransaction(System.Data.IsolationLevel.RepeatableRead  ))
+            //{
                 var task = GetById(entity.Id);   
                 if (entity.Id == task.Id)
                 {
                     task = entity;
-                    
                     QdbContex.SaveChanges();
-                    transaction.Commit();
-                }
-            }
+                //    transaction.Commit();
+               // }
+              }
         }
 
         public void Clear()
@@ -124,6 +115,7 @@ namespace AbstractQueue.TaskStore
 
         public void SetFailedStatus(QueueTask task)
         {
+            //var test = QdbContex.QueueTasks.AsNoTracking()
             task.QueueTaskStatus = QueueTaskStatus.Failed;
             task.ExecutedDate = DateTime.Now;
             Update(task);
@@ -155,10 +147,7 @@ namespace AbstractQueue.TaskStore
             return QdbContex.QueueTasks.Find(id);
         }
 
-        private  QueueTask GetById(int id, QueueDataBaseContext QdbContex)
-        {
-            return QdbContex.QueueTasks.Find(id);
-        }
+       
 
         public  QueueTask GetById(string id)
         {
@@ -169,10 +158,7 @@ namespace AbstractQueue.TaskStore
         {
             return QdbContex.QueueTasks.Find(entity);
         }
-
-
-
-
+         
         public  void DeleteById(string id)
         {
             var task = GetById(id);
@@ -186,17 +172,15 @@ namespace AbstractQueue.TaskStore
             return QdbContex.QueueTasks.Where(predicate).ToList();
         }
 
-        public  IEnumerable<QueueTask> Where(System.Linq.Expressions.Expression<Func<QueueTask, bool>> predicate)
+        public IQueryable<QueueTask> Where(System.Linq.Expressions.Expression<Func<QueueTask, bool>> predicate)
         {
-            return QdbContex.QueueTasks.Where(predicate).ToList();
+            return QdbContex.QueueTasks.Where(predicate);
         }
 
         public  QueueTask FirstOrDefault(System.Linq.Expressions.Expression<Func<QueueTask, bool>> predicate)
         {
             return QdbContex.QueueTasks.FirstOrDefault(predicate);
         }
-
-
 
          
     }
