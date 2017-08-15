@@ -13,9 +13,9 @@ namespace AbstractQueue.Core
          /// </summary>
         internal int Id { get; set; }
         /// <summary>
-        /// Concrete executer
+        /// Concrete execution
         /// </summary>
-        private readonly AbstractTaskExecuter Executer;
+        private readonly BehaviorTaskExecution _execution;
 
         private bool isTryHandleError = false;
         private int attemptMaxCount;
@@ -68,11 +68,11 @@ namespace AbstractQueue.Core
         }
 
 
-        public QueueWorker(AbstractTaskExecuter executer, string queueName, int attemptMaxCount = 0)
+        public QueueWorker(BehaviorTaskExecution execution, string queueName, int attemptMaxCount = 0)
         {
             this.WorkerTaskStore = BuildTaskStore();
             this.TryStartTask();
-            this.Executer = executer;
+            this._execution = execution;
             this.AttemptMaxCount = attemptMaxCount;
             this.queueName = queueName;
             this.SetStatusFree();
@@ -127,7 +127,7 @@ namespace AbstractQueue.Core
                 {
                     try
                     {
-                        Executer.Execute(currentTask);
+                        _execution.Execute(currentTask);
                         WorkerTaskStore.SetSuccessStatus(currentTask);
                     }
                     catch
@@ -156,7 +156,7 @@ namespace AbstractQueue.Core
                 WorkerTaskStore.SetProccesStatus(currentTask);
                 try
                 {
-                    Executer.Execute(currentTask);
+                    _execution.Execute(currentTask);
                     WorkerTaskStore.SetSuccessStatus(currentTask);
                 }
                 catch

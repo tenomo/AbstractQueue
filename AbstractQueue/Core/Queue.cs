@@ -23,7 +23,7 @@ namespace AbstractQueue.Core
         /// <summary>
         /// Concrete executer
         /// </summary>
-        private AbstractTaskExecuter Executer
+        private BehaviorTaskExecution Executer
         {
             get { return _executer; }
             set
@@ -37,7 +37,7 @@ namespace AbstractQueue.Core
         private int attemptMaxCount;
 
         private TaskStore.TaskStore QueueTaskStore { get; set; }
-        private AbstractTaskExecuter _executer;
+        private BehaviorTaskExecution _executer;
         private string _queueName;
 
       
@@ -85,7 +85,7 @@ namespace AbstractQueue.Core
         }
 
 
-        internal Queue(int queueWorkersCount, AbstractTaskExecuter executer, string queueName)
+        internal Queue(int queueWorkersCount, BehaviorTaskExecution executer, string queueName)
         {
             QueueName = queueName;
             this.QueueWorkersCount = queueWorkersCount;
@@ -96,7 +96,7 @@ namespace AbstractQueue.Core
            
         }
 
-        internal Queue(int queueWorkersCount, AbstractTaskExecuter executer, string queueName, int attemptMaxCount)
+        internal Queue(int queueWorkersCount, BehaviorTaskExecution executer, string queueName, int attemptMaxCount)
             : this(queueWorkersCount, executer, queueName)
         {
             
@@ -104,7 +104,7 @@ namespace AbstractQueue.Core
             QueueWorkers = BuildWorkers(QueueWorkersCount, Executer, QueueName, attemptMaxCount);
         }
 
-        private QueueWorker[] BuildWorkers(int queueWorkersCount, AbstractTaskExecuter executer, string queueName,
+        private QueueWorker[] BuildWorkers(int queueWorkersCount, BehaviorTaskExecution executer, string queueName,
             int attemptMaxCount = 0)
         {
             var workers = new QueueWorker[queueWorkersCount];

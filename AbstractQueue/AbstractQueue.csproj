@@ -47,7 +47,7 @@
     <Reference Include="System.Xml" />
   </ItemGroup>
   <ItemGroup>
-    <Compile Include="Core\AbstractTaskExecuter.cs" />
+    <Compile Include="Core\BehaviorTaskExecution.cs" />
     <Compile Include="Config.cs" />
     <Compile Include="Core\IQueue.cs" />
     <Compile Include="Core\QueueWorker.cs" />

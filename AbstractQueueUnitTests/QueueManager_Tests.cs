@@ -1,8 +1,5 @@
-﻿using System.Runtime.Remoting;
-using System.Threading.Tasks;
-using AbstractQueue.Core;
+﻿using AbstractQueue.Core;
 using AbstractQueue.QueueData.Entities;
-using AbstractQueue.TaskStore;
 using Microsoft.VisualStudio.TestTools.UnitTesting;
 
 namespace AbstractQueueUnitTests
@@ -30,9 +27,9 @@ namespace AbstractQueueUnitTests
         public void Test_Get_Queue()
         {
             // var context = new QueueDBContext();
-            var queue_one = QueueFactory.CreateQueue(2, new MockTaskExecuter(), QueueNameOne);
-            var queue_two = QueueFactory.CreateQueue(3, new MockTaskExecuter(), QueueNameTwo);
-            var queue_three = QueueFactory.CreateQueue(4, new MockTaskExecuter(), QueueNameThree);
+            var queue_one = QueueFactory.CreateQueue(2, new MockTaskExecution(), QueueNameOne);
+            var queue_two = QueueFactory.CreateQueue(3, new MockTaskExecution(), QueueNameTwo);
+            var queue_three = QueueFactory.CreateQueue(4, new MockTaskExecution(), QueueNameThree);
 
 
             QueueManager.Kernal.RegistrateQueue(queue_one);
@@ -73,7 +70,7 @@ namespace AbstractQueueUnitTests
             int itterationCount = 10;
             object executedTasksCount = 1;
             const string queueName = "Test_Queue_QM_On_NumberCalculateExecuter_with_2_Workers";
-            var queue = QueueFactory.CreateQueue(2, new MockTaskExecuter(), queueName);
+            var queue = QueueFactory.CreateQueue(2, new MockTaskExecution(), queueName);
         
             QueueManager.Kernal.RegistrateQueue(queue);
 
@@ -87,7 +84,7 @@ namespace AbstractQueueUnitTests
 
 
 
-        class MockTaskExecuter : AbstractTaskExecuter
+        class MockTaskExecution : BehaviorTaskExecution
         {
             public override void Execute(QueueTask queueTask)
             {
