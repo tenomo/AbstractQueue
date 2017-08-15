@@ -159,9 +159,8 @@ namespace AbstractQueue.Core
         /// Try execute task.
         /// </summary>
         private void TryStartNextTask()
-        {
-            var isCan = IsCanExecuteTask();
-            if (!isCan)
+        { 
+            if (!IsCanExecuteTask())
                 SetStatusFree();
             else
             {
@@ -200,28 +199,18 @@ namespace AbstractQueue.Core
             var tasks = WorkerTaskStore.Where(each=>each.QueueName == queueName && each.QueueTaskStatus == QueueTaskStatus.Created || each.QueueTaskStatus == QueueTaskStatus.Failed);
             var task = tasks.ToList().FirstOrDefault(each => CheckStatus(each) && each.QueueName == queueName);
 
-            var isCan = task != null;
+            Func<bool> freeTask =  delegate {
+                currentTask = null;
+                SetStatusFree();
+                return false;
+            };
 
-            if (isCan)
-            {
-                if (CheckStatus(task) &&
-                    CheckOnAttemptLimit(task))
-                {
-                    currentTask = task;
-                    currentTask.TaskIndexInQueue = this.Id;
-                    WorkerTaskStore.Update(currentTask);
-                    return isCan;
-                }
-                else
-                {
-                    currentTask = null;
-                    SetStatusFree();
-                    return false;
-                }
-            }
-            currentTask = null;
-            SetStatusFree();
-            return false; 
+            if (task == null) return freeTask();
+            if (!CheckStatus(task) || !CheckOnAttemptLimit(task)) return freeTask();
+            currentTask = task;
+            currentTask.TaskIndexInQueue = this.Id;
+            WorkerTaskStore.Update(currentTask);
+            return true;
         }
 
 
@@ -233,16 +222,10 @@ namespace AbstractQueue.Core
         /// <returns></returns>
         private bool CheckStatus(QueueTask task)
         {
-            
-            var _isHandleFailed = this.isTryHandleError;
-
-            if (_isHandleFailed)
-            {
-
-                return  (task?.QueueTaskStatus == QueueTaskStatus.Created || task?.QueueTaskStatus == QueueTaskStatus.Failed);
-            }
-            else
-                return task?.QueueTaskStatus == QueueTaskStatus.Created;
+            if (task == null) throw new ArgumentNullException(nameof(task));
+            return isTryHandleError
+                ? task?.QueueTaskStatus == QueueTaskStatus.Created || task?.QueueTaskStatus == QueueTaskStatus.Failed
+                : task?.QueueTaskStatus == QueueTaskStatus.Created;
         }
 
         /// <summary>
@@ -251,17 +234,11 @@ namespace AbstractQueue.Core
         /// <param name="task"></param>
         /// <returns></returns>
         private bool CheckOnAttemptLimit(QueueTask task)
-        {
-            var countHandleFailed = CountHandleFailed;
-            if (task == null)
-                return false;
-            if (isTryHandleError   && task.QueueTaskStatus == QueueTaskStatus.Failed &&
-                task.Attempt <= countHandleFailed)
-                return true;
-
-            return   task.QueueTaskStatus == QueueTaskStatus.Created;
-
-
+        { 
+            if (task == null) return false;
+            if (!isTryHandleError || task.QueueTaskStatus != QueueTaskStatus.Failed ||
+                task.Attempt > CountHandleFailed) return task.QueueTaskStatus == QueueTaskStatus.Created;
+            return true;
         }
 
         /// <summary>
@@ -270,6 +247,7 @@ namespace AbstractQueue.Core
         /// <param name="task"></param>
         private void UpExecutionAttempt(QueueTask task)
         {
+            if (task == null) throw new ArgumentNullException(nameof(task));
             task.Attempt++;
             WorkerTaskStore.Update(task);
         } 
