@@ -3,7 +3,7 @@ using AbstractQueue.QueueData.Entities;
 
 namespace AbstractQueueUnitTests.Mock
 {
-   internal class MockBehaviorErorrTaskExecution : MockBehaviorTaskExecution
+    internal class MockBehaviorErorrTaskExecution : MockBehaviorTaskExecution
     {
         public override void Execute(QueueTask queueTask)
         {
