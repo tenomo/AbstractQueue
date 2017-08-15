@@ -1,11 +1,8 @@
 ﻿using System;
 using System.Threading;
 using System.Threading.Tasks;
-using AbstractQueue;
 using AbstractQueue.Core;
-using AbstractQueue.Infrastructure;
 using AbstractQueue.QueueData.Entities;
-using AbstractQueue.TaskStore;
 using Microsoft.VisualStudio.TestTools.UnitTesting;
 
 namespace AbstractQueueUnitTests
@@ -13,47 +10,44 @@ namespace AbstractQueueUnitTests
     [TestClass]
     public class Queue_Tests
     {
-        class MockTaskExecuter : AbstractTaskExecuter
+        class MockTaskExecution : BehaviorTaskExecution
         {
-            private int _executionTaskCount;
+            private int _executionTaskCount = 0;
             private object lockObj = new object();
+
             public int ExecutionTaskCount
             {
                 get
                 {
                     lock (lockObj)
                     {
-                            return  _executionTaskCount;
+                        return _executionTaskCount;
                     }
-                
                 }
                 set
                 {
                     lock (lockObj)
-                    {       _executionTaskCount = value;
-                        
+                    {
+                        _executionTaskCount = value;
+
                     }
-             
+
                 }
             }
 
             public override void Execute(QueueTask queueTask)
             {
-              
                 ExecutionTaskCount++;
             }
         }
-        class MockErorrTaskExecuter : AbstractTaskExecuter
-        {
-            public int ExecutionTaskCount { get; set; } = 1;
 
+        class MockErorrTaskExecution : MockTaskExecution
+        {
             public override void Execute(QueueTask queueTask)
             {
-                if (ExecutionTaskCount % 2 == 0)
-                {
-                    throw  new ExecutionEngineException();
-                    ExecutionTaskCount++;
-                }
+                if (queueTask.Attempt < 2)
+                    throw new ExecutionEngineException();
+                base.Execute(queueTask);
             }
         }
 
@@ -62,49 +56,56 @@ namespace AbstractQueueUnitTests
 
         }
 
+        private void WaitTast(int timeout)
+        {
+            WaitTast(timeout);
+        }
 
-        [TestMethod]
-        public void execute_tasks_1_worker_test()
+    [TestMethod]
+        public void execute_tasks_1_worker_10_Iterations()
         {
             int itterationCount = 10;  
-            const string queueName = "execute_tasks_1_worker_test";
+            const string queueName = "execute_tasks_1_worker_10_Iterations";
             int workerscount = 1;
-            var executer = new MockTaskExecuter();
+            var executer = new MockTaskExecution();
             var queue = QueueFactory.CreateQueue(workerscount, executer, queueName);
           
             for (int i = 1; i <= itterationCount; i++)
             {
                 queue.AddTask(QueueTask.Create(0, i.ToString()));
             }
-            Thread.Sleep(10000);
-            Assert.AreEqual(itterationCount.ToString(), executer.ExecutionTaskCount);
-
+            WaitTast(100);
+            Assert.AreEqual(itterationCount.ToString(), executer.ExecutionTaskCount.ToString());
         }
 
         [TestMethod]
-        public void execute_task_4_worker_test()
+        public void execute_tasks_4_worker_10_Iterations()
         {
             int itterationCount = 10;
-            const string queueName = "execute_task_4_worker_test";
+            const string queueName = "execute_tasks_4_worker_10_Iterations";
             int workerscount = 4;
-            var executer = new MockTaskExecuter();
+
+            var executer = new MockTaskExecution();
+
             var queue = QueueFactory.CreateQueue(workerscount, executer, queueName);
 
             for (int i = 1; i <= itterationCount; i++)
             {
                 queue.AddTask(QueueTask.Create(0, i.ToString()));
             }
-            Thread.Sleep(10000);
-            Assert.AreEqual(itterationCount.ToString(), executer.ExecutionTaskCount);
+            WaitTast(100);
+            Assert.AreEqual(itterationCount.ToString(), executer.ExecutionTaskCount.ToString());
         }
 
+
+        Random rnd = new Random();
         [TestMethod]
         public void execute_task_4_worker_self_tread_test()
         {
             int itterationCount = 10;
             const string queueName = "execute_task_4_worker_test";
             int workerscount = 4;
-            var executer = new MockTaskExecuter();
+            var executer = new MockTaskExecution();
             var queue = QueueFactory.CreateQueue(workerscount, executer, queueName);
 
             for (int i = 1; i <= itterationCount; i++)
@@ -113,10 +114,14 @@ namespace AbstractQueueUnitTests
                 {
                     queue.AddTask(QueueTask.Create(0, i.ToString()));
                 });
-
+                var a = rnd.Next(1, 31);
+                if (a  % 2 == 0)
+                {
+                    WaitTast(100);
+                }
             }
-            Thread.Sleep(10000);
-            Assert.AreEqual(itterationCount.ToString(), executer.ExecutionTaskCount);
+            WaitTast(10000);
+            Assert.AreEqual(itterationCount.ToString(), executer.ExecutionTaskCount.ToString());
         }
 
 
@@ -129,7 +134,7 @@ namespace AbstractQueueUnitTests
         //    const string queueName = "ExecuteTasks_on_2_Workers_handle_error_Test";
         //    int workerscount = 4;
         //    int attemptsCount = 3;
-        //    var queue = QueueFactory.CreateQueueHandleFailed(workerscount, new MockTaskExecuter(), attemptsCount, queueName);
+        //    var queue = QueueFactory.CreateQueueHandleFailed(workerscount, new MockTaskExecution(), attemptsCount, queueName);
         //    //queue.TaskExecutionEvents.SuccessExecuteTaskEvent += delegate (ITaskStore store, QueueTask task)
         //    //{
         //    //    executedTasksCount++;

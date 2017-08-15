@@ -1,8 +1,5 @@
-﻿using System.Runtime.Remoting;
-using System.Threading.Tasks;
-using AbstractQueue.Core;
+﻿using AbstractQueue.Core;
 using AbstractQueue.QueueData.Entities;
-using AbstractQueue.TaskStore;
 using Microsoft.VisualStudio.TestTools.UnitTesting;
 
 namespace AbstractQueueUnitTests
@@ -10,29 +7,29 @@ namespace AbstractQueueUnitTests
     [TestClass]
     public class QueueManager_Tests
     {
-        
+
         private readonly string QueueNameOne = "One";
         private readonly string QueueNameTwo = "Two";
         private readonly string QueueNameThree = "Three";
 
-      //  private readonly QueueDBContext context;
+        //  private readonly QueueDBContext context;
         private readonly string[] queue_names;
 
 
         public QueueManager_Tests()
         {
-       
-            queue_names =  new  [] { QueueNameOne, QueueNameTwo, QueueNameThree };
-        //    context =DBSingle.DbContext;
+
+            queue_names = new[] { QueueNameOne, QueueNameTwo, QueueNameThree };
+            //    context =DBSingle.DbContext;
         }
         [TestMethod]
 
         public void Test_Get_Queue()
         {
-           // var context = new QueueDBContext();
-            var queue_one = QueueFactory.CreateQueue(2, new MockTaskExecuter(), QueueNameOne);
-            var queue_two = QueueFactory.CreateQueue(3, new MockTaskExecuter(),   QueueNameTwo);
-            var queue_three = QueueFactory.CreateQueue(4, new MockTaskExecuter(),   QueueNameThree);
+            // var context = new QueueDBContext();
+            var queue_one = QueueFactory.CreateQueue(2, new MockTaskExecution(), QueueNameOne);
+            var queue_two = QueueFactory.CreateQueue(3, new MockTaskExecution(), QueueNameTwo);
+            var queue_three = QueueFactory.CreateQueue(4, new MockTaskExecution(), QueueNameThree);
 
 
             QueueManager.Kernal.RegistrateQueue(queue_one);
@@ -69,58 +66,33 @@ namespace AbstractQueueUnitTests
         /// </summary>
         [TestMethod]
         public void Test_Queue_QM_On_NumberCalculateExecuter_with_2_Workers()
-        { 
+        {
             int itterationCount = 10;
             object executedTasksCount = 1;
             const string queueName = "Test_Queue_QM_On_NumberCalculateExecuter_with_2_Workers";
-            var queue = QueueFactory.CreateQueue(2, new MockTaskExecuter(), queueName);
-            //queue.TaskExecutionEvents.SuccessExecuteTaskEvent += delegate(ITaskStore store, QueueTask task)
-            //{
-            //    System.Diagnostics.Debug.WriteLine("work");
-            //    int temp = (int)executedTasksCount;
-            //    temp++;
-            //    executedTasksCount = temp;
-            //};
+            var queue = QueueFactory.CreateQueue(2, new MockTaskExecution(), queueName);
+        
             QueueManager.Kernal.RegistrateQueue(queue);
 
             for (int i = 0; i < itterationCount; i++)
             {
-                QueueManager.Kernal[queueName].AddTask(QueueTask.Create(0,i.ToString()));
+                QueueManager.Kernal[queueName].AddTask(QueueTask.Create(0, i.ToString()));
             }
             Assert.AreEqual(itterationCount, executedTasksCount);
         }
 
 
-        [TestMethod]
-        public void Test_Queue_QM__with_2_Workers_multy_thread_calls()
-        {
-            int itterationCount = 10;
-            int executedTasksCount = 1;
-            const string queueName = "Test_Queue_QM_On_NumberCalculateExecuter_with_2_Workers";
-            var queue = QueueFactory.CreateQueue(2, new MockTaskExecuter(), queueName);
-            //queue.TaskExecutionEvents.SuccessExecuteTaskEvent += delegate (ITaskStore store, QueueTask task)
-            //{
-            //    executedTasksCount++;
-            //};
-            QueueManager.Kernal.RegistrateQueue(queue);
 
-            for (int i = 0; i < itterationCount; i++)
-            {
-                new TaskFactory().StartNew(() => { QueueManager.Kernal[queueName].AddTask(QueueTask.Create(0, i.ToString())); });
-      
-            }
-            Assert.AreEqual(itterationCount, executedTasksCount);
-        }
 
-        class MockTaskExecuter :AbstractTaskExecuter
+        class MockTaskExecution : BehaviorTaskExecution
         {
             public override void Execute(QueueTask queueTask)
             {
-                 
+
             }
         }
 
     }
-    }
- 
- 
+}
+
+

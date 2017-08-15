@@ -1,8 +1,8 @@
 ﻿using AbstractQueue.QueueData.Entities;
 
 namespace AbstractQueue.Core
-{
-    public abstract class AbstractTaskExecuter
+{  
+    public abstract class BehaviorTaskExecution
     {
         /// <summary>
         /// Execute queueTask.
