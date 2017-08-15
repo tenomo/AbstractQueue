@@ -36,17 +36,17 @@ namespace AbstractQueueUnitTests.QueueTests
 
             for (int i = 1; i <= itterationCount; i++)
             {
-                new TaskFactory().StartNew(() =>
-                {
-                    queue.AddTask(QueueTask.Create(0, i.ToString()));
-                });
+               // new TaskFactory().StartNew(() =>
+               // {
+                    queue.AddTaskAsync(QueueTask.Create(0, i.ToString())).Wait(); 
+               // });
                 var a = rnd.Next(1, 31);
                 if (a % 2 == 0)
                 {
-                    WaitTast(100);
+                    WaitTast(2);
                 }
             }
-            WaitTast(10000);
+         //   WaitTast(300);
             Assert.AreEqual(itterationCount.ToString(), executer.ExecutionTaskCount.ToString());
         }
 
@@ -61,17 +61,17 @@ namespace AbstractQueueUnitTests.QueueTests
 
             for (int i = 1; i <= itterationCount; i++)
             {
-                new TaskFactory().StartNew(() =>
-                {
-                    queue.AddTask(QueueTask.Create(0, i.ToString()));
-                });
+               // new TaskFactory().StartNew(() =>
+              ///  {
+                    queue.AddTaskAsync(QueueTask.Create(0, i.ToString())).Wait(); 
+               // }).Wait();
                 var a = rnd.Next(1, 31);
                 if (a % 2 == 0)
                 {
                     WaitTast(100);
                 }
             }
-            WaitTast(10000);
+       //     WaitTast(300);
             Assert.AreEqual(itterationCount.ToString(), executer.ExecutionTaskCount.ToString());
         }
 
@@ -88,15 +88,15 @@ namespace AbstractQueueUnitTests.QueueTests
             {
                 new TaskFactory().StartNew(() =>
                 {
-                    queue.AddTask(QueueTask.Create(0, i.ToString()));
-                });
+                    queue.AddTaskAsync(QueueTask.Create(0, i.ToString()));
+                }).Wait();
                 var a = rnd.Next(1, 31);
                 if (a % 2 == 0)
                 {
                     WaitTast(2);
                 }
             }
-            WaitTast(10000);
+            WaitTast(1000);
             Assert.AreEqual(itterationCount.ToString(), executer.ExecutionTaskCount.ToString());
         }
 
@@ -111,17 +111,17 @@ namespace AbstractQueueUnitTests.QueueTests
 
             for (int i = 1; i <= itterationCount; i++)
             {
-                new TaskFactory().StartNew(() =>
-                {
-                    queue.AddTask(QueueTask.Create(0, i.ToString()));
-                });
+               // new TaskFactory().StartNew(() =>
+               // {
+                    queue.AddTaskAsync(QueueTask.Create(0, i.ToString())).Wait(); ;
+               // }).Wait();
                 var a = rnd.Next(1, 31);
                 if (a % 2 == 0)
                 {
-                    WaitTast(100);
+                    WaitTast(2);
                 }
             }
-            WaitTast(1 - 0);
+          //  WaitTast(1500);
             Assert.AreEqual(itterationCount.ToString(), executer.ExecutionTaskCount.ToString());
         }
     }

@@ -1,8 +1,7 @@
 ﻿using System;
 using System.Linq;
-using AbstractQueue.Infrastructure;
+using System.Threading.Tasks;
 using AbstractQueue.QueueData.Entities;
-using AbstractQueue.TaskStore;
 
 namespace AbstractQueue.Core
 {
@@ -58,7 +57,7 @@ namespace AbstractQueue.Core
 
         public int AttemptMaxCount
         {
-            get { return AttemptMaxCount; }
+            get { return attemptMaxCount; }
             private set
             {
                 if (value < 0)
@@ -112,13 +111,12 @@ namespace AbstractQueue.Core
             for (int i = queueWorkersCount - 1; i >= 0; i--)
             {
                 workers[i] = new QueueWorker(executer, queueName, attemptMaxCount);
-                var buff = workers[i];
-                 
             }
             return workers;
         }
 
         static object obj = new object();
+
         /// <summary>
         /// Add new task to queue
         /// </summary>
@@ -128,12 +126,16 @@ namespace AbstractQueue.Core
         {
             lock (obj)
             {
-                         queueTask.QueueName = QueueName;
-            QueueTaskStore.Add(queueTask);
-            TryExecuteTask();
-            return QueueTaskStore.IndexOf(queueTask);
+                queueTask.QueueName = QueueName;
+                QueueTaskStore.Add(queueTask);
+                TryExecuteTask();
+                return QueueTaskStore.IndexOf(queueTask);
             }
-   
+        }
+
+        public async Task<int> AddTaskAsync(QueueTask queueTask)
+        {
+            return await new TaskFactory().StartNew( ()=> AddTask(queueTask));
         }
 
         private void TryExecuteTask()
@@ -148,5 +150,7 @@ namespace AbstractQueue.Core
             return worker;
 
         }
+
+      
     }
 }
