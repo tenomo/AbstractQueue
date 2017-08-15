@@ -66,7 +66,7 @@ namespace AbstractQueue.Core
                     throw new ArgumentException("AttemptMaxCount must be more 0");
                 }
 
-                AttemptMaxCount = value;
+                attemptMaxCount = value;
             }
         }
 
@@ -148,10 +148,5 @@ namespace AbstractQueue.Core
             return worker;
 
         }
-
-     
-
-
-        
     }
 }

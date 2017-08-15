@@ -71,7 +71,7 @@ namespace AbstractQueueUnitTests
             object executedTasksCount = 1;
             const string queueName = "Test_Queue_QM_On_NumberCalculateExecuter_with_2_Workers";
             var queue = QueueFactory.CreateQueue(2, new MockTaskExecution(), queueName);
-        
+
             QueueManager.Kernal.RegistrateQueue(queue);
 
             for (int i = 0; i < itterationCount; i++)
