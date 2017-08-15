@@ -19,11 +19,10 @@ namespace AbstractQueue.QueueData.Context
 
         }
 
-        internal QueueDataBaseContext(string connectionName) : base("name=" + connectionName)
+        internal QueueDataBaseContext(string connectionString, bool isConnectionName = true) : base(isConnectionName? "name=" + connectionString : connectionString)
         { 
             dbInitializerStrategy = new CreateDatabaseIfNotExists<QueueDataBaseContext>();
             Database.SetInitializer(dbInitializerStrategy);
-
         }
 
 
