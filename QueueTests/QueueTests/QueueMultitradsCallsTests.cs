@@ -3,12 +3,12 @@ using System.Threading;
 using System.Threading.Tasks;
 using AbstractQueue.Core;
 using AbstractQueue.QueueData.Entities;
-using AbstractQueueUnitTests.Mock;
-using Microsoft.VisualStudio.TestTools.UnitTesting;
+using AbstractQueueUnitTests.Mock; 
+using NUnit.Framework;
 
 namespace AbstractQueueUnitTests.QueueTests
 {
-    [TestClass]
+    [TestFixture]
     public class QueueMultitradsCallsTests
     {
         private void WaitTast(int timeout)
@@ -17,7 +17,7 @@ namespace AbstractQueueUnitTests.QueueTests
         }
         Random rnd = new Random();
 
-        [TestMethod]
+        [Test]
         public void execute_task_1_worker_self_tread__10_Iterations()
         {
             int itterationCount = 10;
@@ -42,7 +42,7 @@ namespace AbstractQueueUnitTests.QueueTests
             Assert.AreEqual(itterationCount.ToString(), executer.ExecutionTaskCount.ToString());
         }
 
-        [TestMethod]
+        [Test]
         public void execute_task_4_worker_self_tread__10_Iterations()
         {
             int itterationCount = 10;
@@ -67,7 +67,7 @@ namespace AbstractQueueUnitTests.QueueTests
             Assert.AreEqual(itterationCount.ToString(), executer.ExecutionTaskCount.ToString());
         }
 
-        [TestMethod]
+        [Test]
         public void execute_task_1_worker_self_tread__100_Iterations()
         {
             int itterationCount = 100;
@@ -92,7 +92,7 @@ namespace AbstractQueueUnitTests.QueueTests
             Assert.AreEqual(itterationCount.ToString(), executer.ExecutionTaskCount.ToString());
         }
 
-        [TestMethod]
+        [Test]
         public void execute_task_4_worker_self_tread__100_Iterations()
         {
             int itterationCount = 100;

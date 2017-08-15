@@ -3,17 +3,17 @@ using System.Threading;
 using System.Threading.Tasks;
 using AbstractQueue.Core;
 using AbstractQueue.QueueData.Entities;
-using AbstractQueueUnitTests.Mock;
-using Microsoft.VisualStudio.TestTools.UnitTesting;
+using AbstractQueueUnitTests.Mock; 
+using NUnit.Framework;
 
 namespace AbstractQueueUnitTests.QueueTests
 {
-    [TestClass]
+    [TestFixture]
     public class QueueNormalTests
     {
-       
 
-       
+
+
 
         public QueueNormalTests()
         {
@@ -27,7 +27,7 @@ namespace AbstractQueueUnitTests.QueueTests
 
 
         #region 10_Iterations
-        [TestMethod]
+        [Test]
         public void execute_tasks_1_worker_10_Iterations()
         {
             int itterationCount = 10;
@@ -44,7 +44,7 @@ namespace AbstractQueueUnitTests.QueueTests
             Assert.AreEqual(itterationCount.ToString(), executer.ExecutionTaskCount.ToString());
         }
 
-        [TestMethod]
+        [Test]
         public void execute_tasks_4_worker_10_Iterations()
         {
             int itterationCount = 10;
@@ -68,7 +68,7 @@ namespace AbstractQueueUnitTests.QueueTests
         #endregion
 
         #region 100_Iterations
-        [TestMethod]
+        [Test]
         public void execute_tasks_1_worker_100_Iterations()
         {
             int itterationCount = 100;
@@ -85,7 +85,7 @@ namespace AbstractQueueUnitTests.QueueTests
             Assert.AreEqual(itterationCount.ToString(), executer.ExecutionTaskCount.ToString());
         }
 
-        [TestMethod]
+        [Test]
         public void execute_tasks_4_worker_100_Iterations()
         {
             int itterationCount = 100;
@@ -105,13 +105,13 @@ namespace AbstractQueueUnitTests.QueueTests
         }
 
 
-       
 
-        
+
+
 
         #endregion
 
-   
+
 
     }
 }

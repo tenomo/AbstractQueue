@@ -4,11 +4,12 @@ using System.Threading.Tasks;
 using AbstractQueue.Core;
 using AbstractQueue.QueueData.Entities;
 using AbstractQueueUnitTests.Mock;
-using Microsoft.VisualStudio.TestTools.UnitTesting;
+using NUnit.Framework;
+
 
 namespace AbstractQueueUnitTests.QueueTests
 {
-    [TestClass]
+    [TestFixture]
     public class QueueErrorHandleTests
     {
         private void WaitTast(int timeout)
@@ -21,7 +22,7 @@ namespace AbstractQueueUnitTests.QueueTests
         Random rnd = new Random();
 
         #region error handle
-        [TestMethod]
+        [Test]
         public void execute_tasks_ERROR_HANDLE_ATTEMPS_1_worker_10_Iterations()
         {
             int itterationCount = 10;
@@ -38,7 +39,7 @@ namespace AbstractQueueUnitTests.QueueTests
             Assert.AreEqual(itterationCount.ToString(), executer.ExecutionTaskCount.ToString());
         }
 
-        [TestMethod]
+        [Test]
         public void execute_tasks_ERROR_HANDLE_ATTEMPS_4_worker_10_Iterations()
         {
             int itterationCount = 10;
@@ -60,7 +61,7 @@ namespace AbstractQueueUnitTests.QueueTests
 
 
 
-        [TestMethod]
+        [Test]
         public void execute_task_ERROR_HANDLE_ATTEMPS_1_worker_1_self_tread__10_Iterations()
         {
             int itterationCount = 10;
@@ -86,7 +87,7 @@ namespace AbstractQueueUnitTests.QueueTests
             Assert.AreEqual(itterationCount.ToString(), executer.ExecutionTaskCount.ToString());
         }
 
-        [TestMethod]
+        [Test]
         public void execute_task_ERROR_HANDLE_ATTEMPS_1_worker_4_self_tread__10_Iterations()
         {
             int itterationCount = 10;

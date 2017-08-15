@@ -3,7 +3,7 @@ using AbstractQueue.QueueData.Entities;
 
 namespace AbstractQueueUnitTests.Mock
 {
-   internal class MockBehaviorTaskExecution : BehaviorTaskExecution
+    internal class MockBehaviorTaskExecution : BehaviorTaskExecution
     {
         private int _executionTaskCount = 0;
         private object lockObj = new object();
