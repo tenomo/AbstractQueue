@@ -86,10 +86,10 @@ namespace AbstractQueueUnitTests.QueueTests
 
             for (int i = 1; i <= itterationCount; i++)
             {
-                new TaskFactory().StartNew(() =>
-                {
-                    queue.AddTaskAsync(QueueTask.Create(0, i.ToString()));
-                }).Wait();
+               // new TaskFactory().StartNew(() =>
+               // {
+                    queue.AddTaskAsync(QueueTask.Create(0, i.ToString())).Wait(); 
+                //}).Wait();
                 var a = rnd.Next(1, 31);
                 if (a % 2 == 0)
                 {
@@ -122,6 +122,31 @@ namespace AbstractQueueUnitTests.QueueTests
                 }
             }
           //  WaitTast(1500);
+            Assert.AreEqual(itterationCount.ToString(), executer.ExecutionTaskCount.ToString());
+        }
+
+        [Test]
+        public void execute_task_20_worker_self_tread__100_Iterations()
+        {
+            int itterationCount = 100;
+            const string queueName = "execute_task_20_worker_self_tread__100_Iterations";
+            int workerscount = 20;
+            var executer = new MockBehaviorTaskExecution();
+            var queue = QueueFactory.CreateQueue(workerscount, executer, queueName);
+
+            for (int i = 1; i <= itterationCount; i++)
+            {
+                // new TaskFactory().StartNew(() =>
+                // {
+                queue.AddTaskAsync(QueueTask.Create(0, i.ToString())).Wait(); ;
+                // }).Wait();
+                var a = rnd.Next(1, 31);
+                if (a % 2 == 0)
+                {
+                    WaitTast(2);
+                }
+            }
+            //  WaitTast(1500);
             Assert.AreEqual(itterationCount.ToString(), executer.ExecutionTaskCount.ToString());
         }
     }

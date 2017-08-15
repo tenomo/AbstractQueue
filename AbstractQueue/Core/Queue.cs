@@ -146,7 +146,9 @@ namespace AbstractQueue.Core
 
         private QueueWorker GetWorker()
         {
-            var worker = QueueWorkers.FirstOrDefault(each => each.InProccess == false);
+           
+            var worker = QueueWorkers.FirstOrDefault(each => !each.InProccess);
+            
             return worker;
 
         }
