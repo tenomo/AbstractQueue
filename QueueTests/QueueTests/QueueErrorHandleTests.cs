@@ -1,6 +1,5 @@
 ﻿using System;
 using System.Threading;
-using System.Threading.Tasks;
 using AbstractQueue;
 using AbstractQueue.Core;
 using AbstractQueue.QueueData.Entities;
@@ -41,7 +40,7 @@ namespace AbstractQueueUnitTests.QueueTests
             {
                 queue.AddTask(QueueTask.Create(0, i.ToString()));
             }
-            WaitTast(100);
+            WaitTast(10000);
             Assert.AreEqual(itterationCount.ToString(), executer.ExecutionTaskCount.ToString());
         }
 
@@ -60,7 +59,7 @@ namespace AbstractQueueUnitTests.QueueTests
             {
                 queue.AddTask(QueueTask.Create(0, i.ToString()));
             }
-            WaitTast(100);
+            WaitTast(30000);
             Assert.AreEqual(itterationCount.ToString(), executer.ExecutionTaskCount.ToString());
         }
 
@@ -79,17 +78,16 @@ namespace AbstractQueueUnitTests.QueueTests
 
             for (int i = 1; i <= itterationCount; i++)
             {
-                new TaskFactory().StartNew(() =>
-                {
-                    queue.AddTask(QueueTask.Create(0, i.ToString()));
-                });
+                 
+                    queue.AddTaskAsync(QueueTask.Create(0, i.ToString())).Wait();
+                
                 var a = rnd.Next(1, 31);
                 if (a % 2 == 0)
                 {
                     WaitTast(2);
                 }
             }
-            WaitTast(100);
+       
             Assert.AreEqual(itterationCount.ToString(), executer.ExecutionTaskCount.ToString());
         }
 
@@ -105,17 +103,16 @@ namespace AbstractQueueUnitTests.QueueTests
 
             for (int i = 1; i <= itterationCount; i++)
             {
-                new TaskFactory().StartNew(() =>
-                {
-                    queue.AddTask(QueueTask.Create(0, i.ToString()));
-                });
+                
+                    queue.AddTaskAsync(QueueTask.Create(0, i.ToString())).Wait();
+                 
                 var a = rnd.Next(1, 31);
                 if (a % 2 == 0)
                 {
                     WaitTast(2);
                 }
             }
-            WaitTast(100);
+         
             Assert.AreEqual(itterationCount.ToString(), executer.ExecutionTaskCount.ToString());
         }
 

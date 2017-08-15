@@ -234,9 +234,9 @@ namespace AbstractQueue.Core
         private bool CheckStatus(QueueTask task)
         {
             
-            var _isHandleFailed = this.isTryHandleError;
+        //    var _isHandleFailed = this.isTryHandleError;
 
-            if (_isHandleFailed)
+            if (isTryHandleError)
             {
 
                 return  (task?.QueueTaskStatus == QueueTaskStatus.Created || task?.QueueTaskStatus == QueueTaskStatus.Failed);
